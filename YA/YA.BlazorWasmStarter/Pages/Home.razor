@@ -1,0 +1,17 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<p class="mb-1">@password</p>
+
+<input type="text" class="form-control" @bind="password" @bind:event="oninput"/>
+
+<p class="mb-1 mt-3">@passwordLength</p>
+
+<input type="range" class="form-range" step="1" min="6" max="30" @bind="passwordLength" @bind:event="oninput" />
+
+@code
+{
+    private string password = string.Empty;
+    private int passwordLength = 6;
+}
