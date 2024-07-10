@@ -1,14 +1,48 @@
 ﻿@page "/"
 @using System.Text
+@using YA.BlazorWasmStarter.Enums
 
 <PageTitle>Home</PageTitle>
 
-<div class="input-group mb-3">
-    <input @bind="password" readonly="readonly" type="text" class="form-control">
-    <span @onmouseenter="@(() => OnEmojiHover("copy"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverCopyCss" id="basic-addon2">📄</span>
-    <span @onclick="HandleGeneratePasswordClick" @onmouseenter="@(() => OnEmojiHover("generate"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverGenerateCss" id="basic-addon3">🔄</span>
-    <span @onclick="HandleSavePasswordClick" @onmouseenter="@(() => OnEmojiHover("save"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverSaveCss" id="basic-addon4">💾</span>
+
+<div class="card">
+    <div class="card-body">
+
+
+        <div class="input-group mb-3">
+            <input @bind="password" readonly="readonly" type="text" class="form-control">
+            <span @onmouseenter="@(() => OnEmojiHover("copy"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverCopyCss" id="basic-addon2">📄</span>
+            <span @onclick="HandleGeneratePasswordClick" @onmouseenter="@(() => OnEmojiHover("generate"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverGenerateCss" id="basic-addon3">🔄</span>
+            <span @onclick="HandleSavePasswordClick" @onmouseenter="@(() => OnEmojiHover("save"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverSaveCss" id="basic-addon4">💾</span>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" @bind="@includeNumbers" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                <label class="form-check-label">Numbers</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" @bind="@includeLowercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Lowercase))">
+                <label class="form-check-label">Lowercase</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" @bind="@includeUppercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Uppercase))">
+                <label class="form-check-label">Uppercase</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox"  @bind="@includeSpecialChars" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.SpecialChars))">
+                <label class="form-check-label" >Special Chars</label>
+            </div>
+        </div>
+        
+        <div>
+            <p class="mb-1 mt-3">Password Length: <b>@passwordLength</b></p>
+
+            <input type="range" class="form-range" step="1" min="8" max="50" @bind="passwordLength" @bind:event="oninput" />
+        </div>
+    </div>
 </div>
+
 
 <div class="card mt-3">
     <div class="card-header">
@@ -26,8 +60,9 @@
 
 @code
 {
+
     private string password = string.Empty;
-    private int passwordLength = 6;
+    private int passwordLength = 12;
     private HashSet<string> savedPasswords = [];
 
     private string onHoverCopyCss = string.Empty;
@@ -53,15 +88,44 @@
     // allSpecialCharacters = "!@#$%^&*()_+-=[]{}|;':,.<>?";
     // Istanbul Lat/Long: 41.0082° N, 28.9784° E
 
+    protected override void OnInitialized()
+    {
+        GeneratePassword();
+
+        base.OnInitialized();
+    }
+
     private void HandleSavePasswordClick()
     {
-        if (string.IsNullOrEmpty(password) || savedPasswords.Any(x=> x == password))
-         return;
+        if (string.IsNullOrEmpty(password) || savedPasswords.Any(x => x == password))
+            return;
 
         savedPasswords.Add(password);
     }
 
+    private void HandleCheckboxOnChange(ChangeEventArgs args, CheckBoxActionType actionType)
+    {
+        if (args.Value is null)
+            return;
+
+        var result = actionType switch
+        {
+            CheckBoxActionType.SpecialChars => includeSpecialChars = (bool)args.Value,
+            CheckBoxActionType.Numbers => includeNumbers = (bool)args.Value,
+            CheckBoxActionType.Uppercase => includeUppercase = (bool)args.Value,
+            CheckBoxActionType.Lowercase => includeLowercase = (bool)args.Value,
+            _ => throw new ArgumentException("Geçersiz CheckBoxActionType", nameof(actionType))
+        };
+
+        GeneratePassword();
+    }
+
     private void HandleGeneratePasswordClick()
+    {
+        GeneratePassword();
+    }
+
+    private void GeneratePassword()
     {
         stringBuilder.Clear();
 
@@ -80,6 +144,12 @@
 
         if (includeSpecialChars)
             validChars.Append(specialCharacters);
+
+        if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSpecialChars)
+        {
+            includeNumbers = true;
+            validChars.Append(numbers);
+        }
 
 
         for (int i = 0; i < passwordLength; i++)
