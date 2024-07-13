@@ -1,4 +1,6 @@
-﻿namespace YA.BlazorWasmStarter.Enums
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace YA.BlazorWasmStarter.Enums
 {
     public enum CheckBoxActionType
     {
