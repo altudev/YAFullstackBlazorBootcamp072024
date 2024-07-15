@@ -28,15 +28,15 @@
                     <label class="form-check-label">Numbers</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" @bind="@includeLowercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                    <input class="form-check-input" type="checkbox" @bind="@includeLowercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Lowercase))">
                     <label class="form-check-label">Lowercase</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" @bind="@includeUppercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                    <input class="form-check-input" type="checkbox" @bind="@includeUppercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Uppercase))">
                     <label class="form-check-label">Uppercase</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" @bind="@includeSpecialChars" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                    <input class="form-check-input" type="checkbox" @bind="@includeSpecialChars" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.SpecialChars))">
                     <label class="form-check-label">Special Chars</label>
                 </div>
             </div>
@@ -61,18 +61,25 @@
             <h3 class="mb-0 animate-title">Saved Passwords</h3>
         </div>
         <div class="card-body animate-card">
-            <ul class="list-group">
-                @foreach (var savedPassword in savedPasswords)
-                {
-                    <li class="list-group-item animate-list-item d-flex justify-content-between">
-                        <span>@savedPassword</span>
-                        <div>
-                            <button class="btn btn-outline-info ms-auto" type="button" @onclick="@(() => CopyPasswordToClipboard(password))">📄</button>
-                            <button class="btn btn-outline-danger ms-auto" type="button" @onclick="@(() => HandleDeleteButtonClick(password))">🗑️</button>
-                        </div>
-                    </li>
-                }
-            </ul>
+            @if (savedPasswords.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var savedPassword in savedPasswords)
+                    {
+                        <li class="list-group-item animate-list-item d-flex justify-content-between">
+                            <span>@savedPassword</span>
+                            <div>
+                                <button class="btn btn-outline-info ms-auto" type="button" @onclick="@(() => CopyPasswordToClipboard(savedPassword))">📄</button>
+                                <button class="btn btn-outline-danger ms-auto" type="button" @onclick="@(() => HandleDeleteButtonClick(savedPassword))">🗑️</button>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <h5 class="text-center text-muted">There aren't any saved passwords.</h5>
+            }
         </div>
     </div>
 </div>
