@@ -113,9 +113,9 @@
         base.OnInitialized();
     }
 
-    private void HandleDeleteButtonClick(string password)
+    private void HandleDeleteButtonClick(string passwordToDelete)
     {
-        savedPasswords.Remove(password);
+        savedPasswords.Remove(passwordToDelete);
 
         ToastService.ShowSuccess("The selected password deleted.");
     }
