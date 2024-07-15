@@ -6,69 +6,69 @@
 
 <PageTitle>Home</PageTitle>
 
-
-<div class="card">
-    <div class="card-body">
-
-
-        <div class="input-group mb-3">
-            <input @bind="password" readonly="readonly" type="text" class="form-control">
-            <span @onmouseenter="@(() => OnEmojiHover("copy"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverCopyCss" id="basic-addon2">📄</span>
-            <span @onclick="HandleGeneratePasswordClick" @onmouseenter="@(() => OnEmojiHover("generate"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverGenerateCss" id="basic-addon3">🔄</span>
-            <span @onclick="HandleSavePasswordClick" @onmouseenter="@(() => OnEmojiHover("save"))" @onmouseleave="@OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverSaveCss" id="basic-addon4">💾</span>
+<div class="d-flex flex-column align-items-center vh-100">
+    <div class="card shadow-lg w-100 mx-2 mx-md-0 mb-3" style="max-width: 960px;">
+        <div class="card-header gradient-header text-white d-flex align-items-center animate-header">
+            <span class="me-2 fs-4 animate-icon">🔒</span>
+            <h3 class="mb-0 animate-title">Password Generator</h3>
         </div>
+        <div class="card-body animate-card">
 
-        <div class="mb-3">
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" @bind="@includeNumbers" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
-                <label class="form-check-label">Numbers</label>
+            <div class="input-group mb-4">
+                <input @bind="password" readonly="readonly" type="text" class="form-control form-control-lg" placeholder="Generated Password">
+                <button @onmouseenter="@(() => OnEmojiHover("copy"))" @onmouseleave="@OnEmojiMouseLeft" class="btn btn-outline-secondary my-clickable-button @onHoverCopyCss animate-button" id="basic-addon2">📄</button>
+                <button @onclick="HandleGeneratePasswordClick" @onmouseenter="@(() => OnEmojiHover("generate"))" @onmouseleave="@OnEmojiMouseLeft" class="btn btn-outline-secondary my-clickable-button @onHoverGenerateCss animate-button" id="basic-addon3">🔄</button>
+                <button @onclick="HandleSavePasswordClick" @onmouseenter="@(() => OnEmojiHover("save"))" @onmouseleave="@OnEmojiMouseLeft" class="btn btn-outline-secondary my-clickable-button @onHoverSaveCss animate-button" id="basic-addon4">💾</button>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" @bind="@includeLowercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Lowercase))">
-                <label class="form-check-label">Lowercase</label>
+
+            <div class="mb-4 animate-checkboxes">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" @bind="@includeNumbers" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                    <label class="form-check-label">Numbers</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" @bind="@includeLowercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                    <label class="form-check-label">Lowercase</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" @bind="@includeUppercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                    <label class="form-check-label">Uppercase</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" @bind="@includeSpecialChars" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
+                    <label class="form-check-label">Special Chars</label>
+                </div>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" @bind="@includeUppercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Uppercase))">
-                <label class="form-check-label">Uppercase</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox"  @bind="@includeSpecialChars" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.SpecialChars))">
-                <label class="form-check-label" >Special Chars</label>
+
+            <div class="container">
+                <h5 class="mb-3">Password Length</h5>
+                <div class="row align-items-center">
+                    <div class="col-md-2 mb-2 mb-md-0">
+                        <input @bind=@passwordLength type="number" class="form-control form-control-sm" min="6" max="50" @oninput="HandlePasswordLengthInputOnChange"/>
+                    </div>
+                    <div class="col-md-8 mb-2 mb-md-0">
+                        <input type="range" class="form-range" step="1" min="6" max="50" @bind="passwordLength" @oninput="HandleRangeOnChange"/>
+                    </div>
+                </div>
             </div>
         </div>
-       
-        <div class="container mt-4">
-            <h5 class="mb-3">Password Length</h5>
-            <div class="row align-items-center">
-                <div class="col-md-2 mb-2 mb-md-0">
-                    <input @bind=@passwordLength type="number" class="form-control" min="6" max="50" @oninput="HandlePasswordLengthInputOnChange"/>
-                </div>
-                <div class="col-md-8 mb-2 mb-md-0">
-                    <input type="range" class="form-range" step="1" min="6" max="50" @bind="passwordLength" @oninput="HandleRangeOnChange"/>
-                </div>
-                <div class="col-md-2">
-                    <span class="badge bg-primary fs-6">@passwordLength characters</span>
-                </div>
-            </div>
+    </div>
+
+    <div class="card shadow-lg w-100 mx-2 mx-md-0" style="max-width: 960px;">
+        <div class="card-header gradient-header text-white d-flex align-items-center animate-header">
+            <span class="me-2 fs-4 animate-icon">💾</span>
+            <h3 class="mb-0 animate-title">Saved Passwords</h3>
+        </div>
+        <div class="card-body animate-card">
+            <ul class="list-group">
+                @foreach (var savedPassword in savedPasswords.Reverse())
+                {
+                    <li class="list-group-item animate-list-item">@savedPassword</li>
+                }
+            </ul>
         </div>
     </div>
 </div>
-
-
-<div class="card mt-3">
-    <div class="card-header">
-        <MaterialSaveIcon Width="2" Height="2" ColourCode="#2E236C" OnClick="@HandleSaveIconClick" /> Saved Passwords
-    </div>
-    <div class="card-body">
-        <ul class="list-group">
-            @foreach (var savedPassword in savedPasswords.Reverse())
-            {
-                <li class="list-group-item">@savedPassword</li>
-            }
-        </ul>
-    </div>
-</div>
-
 @code
 {
 
@@ -232,14 +232,149 @@
     }
 }
 
+
 <style>
-    .form-range::-webkit-slider-thumb {
-        background: #0d6efd;
+    .card {
+        border-radius: 1rem;
     }
-    .form-range::-moz-range-thumb {
-        background: #0d6efd;
+    .card-header {
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
     }
-    .form-range::-ms-thumb {
-        background: #0d6efd;
+
+    .gradient-header {
+        background: #005C97; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #363795, #005C97); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #363795, #005C97); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+    .form-control-lg {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .input-group-text {
+        cursor: pointer;
+    }
+    .input-group-text:hover {
+        background-color: #f8f9fa;
+    }
+    .my-clickable-button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .form-check-label {
+        margin-left: 0.5rem;
+    }
+    .badge {
+        font-size: 1rem;
+    }
+    .shadow-lg {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .vh-100 {
+        height: 100vh;
+    }
+    @@media (max-width: 960px) {
+        .card {
+            margin: 0 1rem;
+        }
+    }
+
+    /* Animations */
+    .animate-header {
+        animation: fadeInDown 1s;
+    }
+    .animate-card {
+        animation: fadeIn 1.5s;
+    }
+    .animate-icon {
+        animation: bounce 2s infinite;
+    }
+    .animate-title {
+        animation: fadeInLeft 1s;
+    }
+    .animate-button {
+        transition: transform 0.2s;
+    }
+    .animate-button:hover {
+        transform: scale(1.1);
+    }
+    .animate-checkboxes {
+        animation: fadeInRight 1s;
+    }
+    .animate-list {
+        animation: fadeInUp 1.5s;
+    }
+    .animate-list-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 1s forwards;
+    }
+
+    @@keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    @@keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-10px);
+        }
+        60% {
+            transform: translateY(-5px);
+        }
+    }
+    @@keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    @@keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
     }
 </style>
