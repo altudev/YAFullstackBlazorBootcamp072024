@@ -2457,7 +2457,7 @@ html {
 /* Blazor Error UI's CSS*/
 
 .invalid {
-  outline: 1px solid red;
+  outline: 2px solid red;
 }
 
 .validation-message {

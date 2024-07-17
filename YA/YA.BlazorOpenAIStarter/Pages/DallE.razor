@@ -7,21 +7,21 @@
 
 <div class="container mx-auto p-4">
     <div class="card bg-base-300 shadow-xl mb-8">
-        <EditForm Model="formModel" OnValidSubmit="@HandleGenerateClick">
+        <EditForm Model="formModel" OnValidSubmit="@HandleGenerateClick" novalidate>
             
             <DataAnnotationsValidator />
 
-            <ValidationSummary class="text-red-500"/>
+            <ValidationSummary/>
 
             <div class="card-body">
                 <h2 class="card-title mb-4">Enter Your Prompt</h2>
                 <InputTextArea @bind-Value="@formModel.Prompt" class="textarea textarea-bordered w-full mb-4 transition-transform transform hover:scale-105" placeholder="Type your prompt here..."></InputTextArea>
-                <ValidationMessage For="@(() => formModel.Prompt)"/>
+                <ValidationMessage For="@(() => formModel.Prompt)" />
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <h2 class="card-title mb-2">Number of Images</h2>
                         <InputNumber @bind-Value="@formModel.NumberOfImages" type="number" class="input input-bordered w-full transition-transform transform hover:scale-105" placeholder="Enter number of images" min="1" max="10"/>
-                        <ValidationMessage For="@(() => formModel.NumberOfImages)"/>
+                        <ValidationMessage For="@(() => formModel.NumberOfImages)" />
                     </div>
                     <div>
                         <h2 class="card-title mb-2">Select Image Size</h2>
@@ -31,7 +31,7 @@
                                 <option value="@size">@size</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => formModel.ImageSize)"/>
+                        <ValidationMessage class="text-red-500" For="@(() => formModel.ImageSize)" />
                     </div>
                 </div>
                 <div class="card-actions justify-end">
