@@ -1,0 +1,66 @@
+﻿@page "/chatgpt"
+@using OpenAI.Interfaces
+@using OpenAI.ObjectModels
+@using OpenAI.ObjectModels.RequestModels
+@inject IOpenAIService OpenAiService
+
+<PageTitle>ChatGPT</PageTitle>
+
+<div class="container mx-auto p-4">
+    <div class="card bg-base-200 shadow-xl mb-8">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Enter Your Prompt</h2>
+            <textarea @bind=@prompt class="textarea textarea-bordered w-full mb-4 transition-transform transform hover:scale-105" placeholder="Type your prompt here..."></textarea>
+            <div class="card-actions justify-end">
+                <button class="btn btn-primary btn-lg transition-transform transform hover:scale-110 shadow-lg" @onclick="GenerateAsync">Generate</button>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(generatedContent))
+    {
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Generated Result</h2>
+                <div class="bg-base-300 p-4 rounded-lg min-h-[100px]">
+                    <pre><code class="text-base-content">
+                            @generatedContent
+                                    </code></pre>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code
+{
+    private string prompt = string.Empty;
+    private string generatedContent = string.Empty;
+
+    private async Task GenerateAsync()
+    {
+        try
+        {
+            var completionResult = await OpenAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
+                {
+                    Messages = new List<ChatMessage>
+                {
+                    ChatMessage.FromSystem("Sen şiir ve şarkı sözü yazmakta usta bir asistansın. Görevin, kullanıcıya şiir ve şarkı sözleri yazmakta yol göstermek, yardımcı olmak ve çözüm üretmektir."),
+                    ChatMessage.FromUser(prompt),
+                },
+                    Model = Models.Gpt_4o,
+                    MaxTokens = 4096,
+                });
+            if (completionResult.Successful)
+            {
+                generatedContent = completionResult.Choices.First().Message.Content;
+                Console.WriteLine(completionResult.Choices.First().Message.Content);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            throw;
+        }
+    }
+}

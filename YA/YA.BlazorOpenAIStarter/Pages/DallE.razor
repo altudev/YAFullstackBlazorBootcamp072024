@@ -1,0 +1,137 @@
+﻿@page "/dall-e"
+@using System.ComponentModel.DataAnnotations
+@using OpenAI.Interfaces
+@using OpenAI.ObjectModels
+@using OpenAI.ObjectModels.RequestModels
+@inject IOpenAIService OpenAiService
+
+<div class="container mx-auto p-4">
+    <div class="card bg-base-300 shadow-xl mb-8">
+        <EditForm Model="formModel" OnValidSubmit="@HandleGenerateClick">
+            
+            <DataAnnotationsValidator />
+
+            <ValidationSummary class="text-red-500"/>
+
+            <div class="card-body">
+                <h2 class="card-title mb-4">Enter Your Prompt</h2>
+                <InputTextArea @bind-Value="@formModel.Prompt" class="textarea textarea-bordered w-full mb-4 transition-transform transform hover:scale-105" placeholder="Type your prompt here..."></InputTextArea>
+                <ValidationMessage For="@(() => formModel.Prompt)"/>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <h2 class="card-title mb-2">Number of Images</h2>
+                        <InputNumber @bind-Value="@formModel.NumberOfImages" type="number" class="input input-bordered w-full transition-transform transform hover:scale-105" placeholder="Enter number of images" min="1" max="10"/>
+                        <ValidationMessage For="@(() => formModel.NumberOfImages)"/>
+                    </div>
+                    <div>
+                        <h2 class="card-title mb-2">Select Image Size</h2>
+                        <InputSelect @bind-Value="formModel.ImageSize" class="select select-bordered w-full transition-transform transform hover:scale-105">
+                            @foreach (var size in sizes)
+                            {
+                                <option value="@size">@size</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => formModel.ImageSize)"/>
+                    </div>
+                </div>
+                <div class="card-actions justify-end">
+                    @if (isLoading)
+                    {
+                        <button disabled="disabled" class="m-1 animate-buttonheartbeat rounded-md bg-gray-500 px-4 py-1 text-lg font-semibold text-white transition-transform transform hover:scale-110 shadow-lg">Generate</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="m-1 animate-buttonheartbeat rounded-md bg-yellow-500 px-4 py-1 text-lg font-semibold text-white transition-transform transform hover:scale-110 shadow-lg">Generate</button>
+                    }
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="flex justify-center items-center h-64">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
+    }
+    else if (imageUrls.Any())
+    {
+        <div id="generated-results" class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Generated Result</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach (var imageUrl in imageUrls)
+                    {
+                        <div class="bg-base-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                            <img src="@imageUrl" alt="Generated Image" class="w-full rounded-lg" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code
+{
+    FormModel formModel = new();
+
+    private bool isLoading = false;
+
+    private IReadOnlyList<string> sizes = ["256x256", "512x512", "1024x1024"];
+
+
+    // Generated Image URLs
+    private List<string> imageUrls = new();
+
+    private async Task HandleGenerateClick()
+    {
+        try
+        {
+            isLoading = true;
+
+            var imageResult = await OpenAiService.Image.CreateImage(new ImageCreateRequest
+            {
+                Prompt = formModel.Prompt,
+                N = formModel.NumberOfImages,
+                Size = formModel.ImageSize,
+                ResponseFormat = StaticValues.ImageStatics.ResponseFormat.Url,
+                User = "TestUser",
+            });
+
+            if (imageResult.Successful)
+            {
+                imageUrls = imageResult.Results.Select(r => r.Url).ToList();
+            }
+            else //handle errors
+            {
+                if (imageResult.Error == null)
+                {
+                    throw new Exception("Unknown Error");
+                }
+
+                Console.WriteLine($"{imageResult.Error.Code}: {imageResult.Error.Message}");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    protected class FormModel
+    {
+        [Required, MinLength(5), MaxLength(250)]
+        public string Prompt { get; set; } = string.Empty;
+
+        [Required, Range(1, 10)] public int NumberOfImages { get; set; } = 0;
+
+        [AllowedValues("256x256", "512x512", "1024x1024")]
+        public string ImageSize { get; set; } = string.Empty;
+    }
+}

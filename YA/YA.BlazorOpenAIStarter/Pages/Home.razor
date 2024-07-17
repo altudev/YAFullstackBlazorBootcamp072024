@@ -1,64 +1,35 @@
 ﻿@page "/"
-@using OpenAI.Interfaces
-@using OpenAI.ObjectModels
-@using OpenAI.ObjectModels.RequestModels
-@inject IOpenAIService OpenAiService
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
-
-
-<div class="container mx-auto p-4">
-    <div class="card bg-base-200 shadow-xl mb-8">
-        <div class="card-body">
-            <h2 class="card-title mb-4">Enter Your Prompt</h2>
-            <textarea @bind=@prompt class="textarea textarea-bordered textarea-lg w-full mb-4" placeholder="Type your prompt here..."></textarea>
-            <div class="card-actions justify-end">
-                <button class="btn btn-primary" @onclick="GenerateAsync">Generate</button>
-            </div>
-        </div>
+<div class="flex h-screen">
+    <div role="button" @onclick="@(() => Navigation.NavigateTo("/chatgpt"))" class="w-1/2 flex items-center justify-center transition-transform duration-300 ease-out @leftSectionClasses">
+        <h1 class="text-4xl font-bold text-white">ChatGPT 🤖</h1>
     </div>
-
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title mb-4">Generated Result</h2>
-            <div class="bg-base-200 p-4 rounded-lg min-h-[100px]">
-                <pre><code class="text-base-content">
-                    @generatedContent
-                </code></pre>
-            </div>
-        </div>
+    <div role="button" @onclick="@(() => Navigation.NavigateTo("/dall-e"))" class="w-1/2 flex items-center justify-center transition-transform duration-300 ease-out @rightSectionClasses"
+         @onmouseover="OnMouseOverRightSection" @onmouseout="OnMouseOutRightSection">
+        <h1 class="text-4xl font-bold text-white">Dall-E 🖼️</h1>
     </div>
 </div>
 
-@code
-{
-    private string prompt = string.Empty;
-    private string generatedContent = string.Empty;
+@code {
+    private string leftSectionClasses = "bg-gradient-to-b from-[#4A00E0] to-[#8E2DE2] rounded-lg";
+    private string rightSectionClasses = "bg-gradient-to-b from-[#FF4B2B] to-[#FF416C] blur-sm rounded-lg";
 
-    private async Task GenerateAsync()
+    private void OnMouseOverRightSection()
     {
-        try
-        {
-            var completionResult = await OpenAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
-            {
-                Messages = new List<ChatMessage>
-                {
-                    ChatMessage.FromSystem("Sen şiir ve şarkı sözü yazmakta usta bir asistansın. Görevin, kullanıcıya şiir ve şarkı sözleri yazmakta yol göstermek, yardımcı olmak ve çözüm üretmektir."),
-                    ChatMessage.FromUser(prompt),
-                },
-                Model = Models.Gpt_4o,
-                MaxTokens = 4096,
-            });
-            if (completionResult.Successful)
-            {
-                generatedContent = completionResult.Choices.First().Message.Content;
-                Console.WriteLine(completionResult.Choices.First().Message.Content);
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.ToString());
-            throw;
-        }
+        leftSectionClasses += " blur";
+        rightSectionClasses = "bg-gradient-to-b from-[#FF4B2B] to-[#FF416C] scale-105";
+    }
+
+    private void OnMouseOutRightSection()
+    {
+        leftSectionClasses = "bg-gradient-to-b from-[#4A00E0] to-[#8E2DE2] rounded-lg";
+        rightSectionClasses = "bg-gradient-to-b from-[#FF4B2B] to-[#FF416C] blur-sm rounded-lg";
     }
 }
+<style>
+    .blur {
+        filter: blur(5px);
+    }
+
+</style>

@@ -4,6 +4,15 @@
 
 /* Blazor Error UI's CSS*/
 
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+}
+
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
