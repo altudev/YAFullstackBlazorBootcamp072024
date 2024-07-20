@@ -1,11 +1,15 @@
 ﻿@page "/weather"
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
+
+<button class="btn btn-ghost" @onclick="@( () => Navigation.NavigateTo("/models/chatgpt") )">Navigate to ChatGPT Page</button>
+<button class="btn btn-secondary" @onclick=@NavigateToDallEPage>Navigate to Dall-E Page</button>
 
 @if (forecasts == null)
 {
@@ -43,6 +47,11 @@ else
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
     }
+
+    private void NavigateToChatGPTPage() => Navigation.NavigateTo("/chatgpt");
+
+    private void NavigateToDallEPage() => Navigation.NavigateTo("/models/dall-e");
+   
 
     public class WeatherForecast
     {

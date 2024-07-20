@@ -1,0 +1,27 @@
+﻿@* @page "/models/{ModelName}" *@
+@page "/models"
+@inject NavigationManager Navigation
+
+@if (ModelName == "chatgpt")
+{
+    <button class="btn btn-danger mb-3" @onclick="@( () => Navigation.NavigateTo("/models?modelName=dall-e") )">Switch to Dall-E Model</button>
+
+    <ChatGpt />
+}
+else
+{
+    <button class="btn btn-danger mb-3" @onclick="@( () => Navigation.NavigateTo("/models?modelName=chatgpt") )">Switch to ChatGPT Model</button>
+
+    <DallE />
+}
+
+
+@code
+{
+    // [Parameter]
+    // public string ModelName { get; set; }
+
+    [SupplyParameterFromQuery(Name = "modelName")]
+    [Parameter]
+    public string ModelName { get; set; }
+}
