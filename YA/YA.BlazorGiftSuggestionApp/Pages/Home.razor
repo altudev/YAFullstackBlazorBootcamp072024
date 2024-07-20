@@ -1,0 +1,106 @@
+﻿@page "/"
+@using System.ComponentModel.DataAnnotations
+@using YA.BlazorGiftSuggestionApp.Enums
+
+<PageTitle>Home</PageTitle>
+
+<div class="flex items-center justify-center min-h-screen bg-base-200">
+    <div class="card w-full max-w-lg shadow-lg bg-base-100 transition-transform transform hover:scale-105 duration-300 ease-in-out">
+        <div class="card-body animate__animated animate__fadeIn">
+            <h1 class="text-2xl font-bold text-center animate__animated animate__fadeInDown">Birthday Gift Suggestion App</h1>
+
+            <EditForm Model="formModel" OnValidSubmit="HandleFormSubmit" novalidate>
+                <DataAnnotationsValidator />
+
+                <div class="form-control animate__animated animate__fadeInLeft flex justify-center">
+                    <div class="w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text">Relationship</span>
+                        </label>
+                        <InputSelect @bind-Value="formModel.Relationship" class="select select-bordered w-full">
+                            <option disabled="disabled" selected="selected">Select a Relationship</option>
+                            @foreach (var relationship in Enum.GetValues<RelationshipType>())
+                            {
+                                <option value="@relationship">@relationship.ToString()</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => formModel.Relationship)" />
+                    </div>
+                </div>
+
+                <div class="form-control animate__animated animate__fadeInRight flex justify-center">
+                    <div class="w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text">Gender</span>
+                        </label>
+                        <InputRadioGroup Name="genderInputGroup" @bind-Value="formModel.Gender">
+                            <div class="flex space-x-4">
+                                @foreach (var gender in Enum.GetValues<Gender>())
+                                {
+                                    <label class="cursor-pointer label">
+                                        <InputRadio Name="genderInputGroup" class="radio radio-accent" value="@gender" TValue="Gender" />
+                                        <span class="label-text ms-1">@gender.ToString()</span>
+                                    </label>
+                                }
+                            </div>
+                        </InputRadioGroup>
+                        <ValidationMessage For="@(() => formModel.Gender)" />
+                    </div>
+                </div>
+
+                <div class="form-control animate__animated animate__fadeInLeft flex justify-center">
+                    <div class="w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text">Age</span>
+                        </label>
+                        <InputNumber @bind-Value="formModel.Age" class="input input-bordered w-full" placeholder="Age" />
+                        <ValidationMessage For="@(() => formModel.Age)" />
+                    </div>
+                </div>
+
+                <div class="form-control animate__animated animate__fadeInRight flex justify-center">
+                    <div class="w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text">Budget in $</span>
+                        </label>
+                        <InputNumber @bind-Value="formModel.Budget" class="input input-bordered w-full" placeholder="Budget in $" />
+                        <ValidationMessage For="@(() => formModel.Budget)" />
+                    </div>
+                </div>
+
+                <div class="form-control mt-6 animate__animated animate__fadeInUp flex justify-center">
+                    <div class="w-full max-w-xs">
+                        <button type="submit" class="btn btn-primary w-full hover:scale-105 transition-transform">Submit 🎁</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private FormModel formModel = new FormModel();
+
+    private async Task HandleFormSubmit()
+    {
+        await Task.CompletedTask;
+    }
+
+    protected class FormModel
+    {
+        [Required]
+        [AllowedValues(RelationshipType.Friend, RelationshipType.Relative,
+            RelationshipType.Parent, RelationshipType.Brother, RelationshipType.Sister,
+            RelationshipType.Child, RelationshipType.Spouse, RelationshipType.Colleague, RelationshipType.Other)]
+        public RelationshipType Relationship { get; set; }
+
+        [Required, Range(1, 100)] public int Age { get; set; } = default;
+
+        [Required, AllowedValues(Gender.Female, Gender.Male)]
+        public Gender Gender { get; set; } = Gender.Female;
+
+        [Required, Range(1, 99999999)]
+        public double Budget { get; set; } = default;
+    }
+}
