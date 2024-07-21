@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.BlazorWasmStarter", "YA.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.BlazorOpenAIStarter", "YA.BlazorOpenAIStarter\YA.BlazorOpenAIStarter.csproj", "{7D79F2C1-7C9D-4677-8B35-85826B306C77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YA.BlazorGiftSuggestionApp", "YA.BlazorGiftSuggestionApp\YA.BlazorGiftSuggestionApp.csproj", "{12D6ED23-E10F-4FAA-9146-00F0DC721C3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.BlazorGiftSuggestionApp", "YA.BlazorGiftSuggestionApp\YA.BlazorGiftSuggestionApp.csproj", "{12D6ED23-E10F-4FAA-9146-00F0DC721C3E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

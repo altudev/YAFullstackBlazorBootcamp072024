@@ -1,0 +1,28 @@
+﻿<div class="p-6 bg-gradient-to-br from-base-300 to-base-100 rounded-lg shadow-xl max-w-2xl mx-auto">
+    <h3 class="text-3xl font-bold text-white text-center mb-6 relative">
+        <span class="relative z-10">Gift Suggestions</span>
+        <svg class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-12 text-white opacity-10 z-0" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M18 5h-2V3a1 1 0 00-1-1H5a1 1 0 00-1 1v2H2a2 2 0 00-2 2v3a2 2 0 002 2h1v6a2 2 0 002 2h10a2 2 0 002-2v-6h1a2 2 0 002-2V7a2 2 0 00-2-2zm-4 12H6v-6h8v6zm2-8H4V5h12v4z" />
+        </svg>
+    </h3>
+
+    <div class="rounded-lg p-6 shadow-inner">
+      @((MarkupString)GeneratedHtml)
+    </div>
+
+    <div class="mt-6 text-center">
+        <button @onclick="Close" class="px-6 py-2 bg-white text-[#02999D] font-semibold rounded-full shadow-md hover:bg-gray-100 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02999D]">
+            Close
+        </button>
+    </div>
+</div>
+@code {
+    [Parameter] public string GeneratedHtml { get; set; }
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    private async Task Close()
+    {
+        await BlazoredModal.CloseAsync();
+    }
+}
