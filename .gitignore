@@ -396,3 +396,11 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+YA/YA.VideoTranscriberApp.ConsoleClient/ffmpeg/
+
+YA/YA.VideoTranscriberApp.ConsoleClient/ffmpeg.exe
+
+YA/YA.VideoTranscriberApp.ConsoleClient/ffplay.exe
+
+YA/YA.VideoTranscriberApp.ConsoleClient/ffprobe.exe

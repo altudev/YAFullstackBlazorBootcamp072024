@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.BlazorOpenAIStarter", "Y
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.BlazorGiftSuggestionApp", "YA.BlazorGiftSuggestionApp\YA.BlazorGiftSuggestionApp.csproj", "{12D6ED23-E10F-4FAA-9146-00F0DC721C3E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VideoTranscriberApp", "VideoTranscriberApp", "{95172BC5-E858-4702-B370-65261BFB8E8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YA.VideoTranscriberApp.ConsoleClient", "YA.VideoTranscriberApp.ConsoleClient\YA.VideoTranscriberApp.ConsoleClient.csproj", "{C4951BE3-7D51-42F4-A7FF-8C0965AEDB58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +31,16 @@ Global
 		{12D6ED23-E10F-4FAA-9146-00F0DC721C3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12D6ED23-E10F-4FAA-9146-00F0DC721C3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12D6ED23-E10F-4FAA-9146-00F0DC721C3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4951BE3-7D51-42F4-A7FF-8C0965AEDB58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4951BE3-7D51-42F4-A7FF-8C0965AEDB58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4951BE3-7D51-42F4-A7FF-8C0965AEDB58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4951BE3-7D51-42F4-A7FF-8C0965AEDB58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C4951BE3-7D51-42F4-A7FF-8C0965AEDB58} = {95172BC5-E858-4702-B370-65261BFB8E8B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {01EF9AC4-6AF1-4F46-9488-60810F77BA70}
