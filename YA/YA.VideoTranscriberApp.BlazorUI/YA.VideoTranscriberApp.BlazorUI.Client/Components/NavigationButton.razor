@@ -1,0 +1,15 @@
+﻿@inject NavigationManager Navigation
+
+<button @onclick="NavigateToUrl" class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-900 transition-all duration-200 border-2 border-gray-200 rounded-md mt-9 hover:bg-gray-900 hover:text-white hover:border-gray-900 focus:bg-gray-900 focus:text-white focus:border-gray-900">
+    @Text
+</button>
+
+@code {
+    [Parameter, EditorRequired] public required string Text { get; set; } = "Start Now! \ud83d\ude80";
+    [Parameter, EditorRequired] public required string Url { get; set; } = "/";
+
+    private void NavigateToUrl()
+    {
+        Navigation.NavigateTo(Url);
+    }
+}
