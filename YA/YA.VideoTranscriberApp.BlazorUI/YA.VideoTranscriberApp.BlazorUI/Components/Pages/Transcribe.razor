@@ -2,6 +2,7 @@
 
 
 @using System.ComponentModel.DataAnnotations
+@using System.Text.Json
 
 @inject HttpClient HttpClient
 
@@ -100,7 +101,7 @@
 
     private async Task UploadVideo()
     {
-        if (!model.IsFileSelected || !model.SelectedLanguages.Any())
+        if (model.SelectedLanguages is null || !model.SelectedLanguages.Any())
         {
             ErrorMessage = "Please select a file and at least one language.";
             return;
@@ -121,11 +122,11 @@
                 content.Add(new StringContent(language), "languages");
             }
 
-            var response = await HttpClient.PostAsync("Videos/Upload", content);
+            var response = await HttpClient.PostAsync("Videos/", content);
 
             if (response.IsSuccessStatusCode)
             {
-                Transcriptions = await response.Content.ReadFromJsonAsync<List<TranscriptionModel>>() ?? [];
+                // Transcriptions = await response.Content.ReadFromJsonAsync<List<TranscriptionModel>>() ?? [];
                 SuccessMessage = "Video uploaded and transcribed successfully!";
             }
             else
@@ -147,6 +148,7 @@
     public class VideoUploadModel
     {
         [Required(ErrorMessage = "Please select a video file.")]
+        [DataType(DataType.Upload)]
         public IBrowserFile VideoFile { get; set; }
 
         [Required(ErrorMessage = "Please select at least one language.")]

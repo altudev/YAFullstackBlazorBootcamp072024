@@ -1,0 +1,161 @@
+﻿@page "/wasm-transcribe"
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveWebAssembly
+
+@inject HttpClient HttpClient
+
+<div class="container mx-auto p-4">
+    <h2 class="text-3xl font-bold mb-6 text-center">Video Transcription and Translation</h2>
+
+    <div class="card w-96 bg-base-100 shadow-xl mx-auto">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Upload Video</h2>
+
+            <EditForm Model="@model" OnValidSubmit="UploadVideo">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-control w-full max-w-xs mb-4">
+                    <label class="label">
+                        <span class="label-text">Select languages for translation</span>
+                    </label>
+
+                    <InputSelect class="select select-bordered" multiple @bind-Value="model.SelectedLanguages">
+                        @foreach (var language in Languages)
+                        {
+                            <option value="@language">@language</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => model.SelectedLanguages)" />
+                </div>
+
+                <div class="form-control w-full max-w-xs mb-4">
+                    <label class="label">
+                        <span class="label-text">Choose a video file</span>
+                    </label>
+                    <InputFile OnChange="OnFileSelected" class="file-input file-input-bordered w-full max-w-xs" accept="video/*" max="" />
+                    <ValidationMessage For="@(() => model.VideoFile)" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full @(IsUploading ? "loading" : "")" disabled="@(!model.IsFileSelected || IsUploading)">
+                    @if (IsUploading)
+                    {
+                        <span class="loading loading-spinner"></span>
+                    }
+                    Upload and Transcribe
+                </button>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="alert alert-error mt-4 transition-all duration-300 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>@ErrorMessage</span>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(SuccessMessage))
+            {
+                <div class="alert alert-success mt-4 transition-all duration-300 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>@SuccessMessage</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Transcriptions != null && Transcriptions.Any())
+    {
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Transcriptions</h2>
+            @foreach (var transcription in Transcriptions)
+            {
+                <div class="card bg-base-100 shadow-xl mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">@transcription.Language</h3>
+                        <p>@transcription.Text</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private VideoUploadModel model = new VideoUploadModel();
+    private static List<string> Languages { get; set; } = ["English", "Spanish", "French", "German", "Italian", "Portuguese", "Russian", "Chinese", "Japanese", "Korean", "Turkish"];
+    private bool IsUploading { get; set; } = false;
+    private string ErrorMessage { get; set; } = string.Empty;
+    private string SuccessMessage { get; set; } = string.Empty;
+    private List<TranscriptionModel> Transcriptions { get; set; } = [];
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        model.VideoFile = e.File;
+        model.IsFileSelected = true;
+    }
+
+    private async Task UploadVideo()
+    {
+        if (!model.IsFileSelected || !model.SelectedLanguages.Any())
+        {
+            ErrorMessage = "Please select a file and at least one language.";
+            return;
+        }
+
+        IsUploading = true;
+        ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
+
+        try
+        {
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(model.VideoFile.OpenReadStream(50000000));
+            content.Add(fileContent, "video", model.VideoFile.Name);
+
+            foreach (var language in model.SelectedLanguages)
+            {
+                content.Add(new StringContent(language), "languages");
+            }
+
+            var response = await HttpClient.PostAsync("Videos/", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Transcriptions = await response.Content.ReadFromJsonAsync<List<TranscriptionModel>>() ?? [];
+                SuccessMessage = "Video uploaded and transcribed successfully!";
+            }
+            else
+            {
+                ErrorMessage = $"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            IsUploading = false;
+        }
+    }
+
+
+    public class VideoUploadModel
+    {
+        [Required(ErrorMessage = "Please select a video file.")]
+        public IBrowserFile VideoFile { get; set; }
+
+        [Required(ErrorMessage = "Please select at least one language.")]
+        [MinLength(1, ErrorMessage = "Please select at least one language.")]
+        public string[] SelectedLanguages { get; set; } = new string[Languages.Count + 1];
+
+        public bool IsFileSelected { get; set; } = false;
+    }
+
+    public class TranscriptionModel
+    {
+        public string Language { get; set; }
+        public string Text { get; set; }
+    }
+}

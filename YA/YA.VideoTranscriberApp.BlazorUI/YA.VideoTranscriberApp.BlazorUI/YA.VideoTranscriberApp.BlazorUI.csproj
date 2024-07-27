@@ -9,6 +9,11 @@
   <ItemGroup>
     <ProjectReference Include="..\YA.VideoTranscriberApp.BlazorUI.Client\YA.VideoTranscriberApp.BlazorUI.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.7" />
+    <PackageReference Include="Xabe.FFmpeg" Version="5.2.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>
