@@ -1,0 +1,27 @@
+﻿<nav class="navbar bg-base-200 transition-transform duration-500 ease-out transform translate-y-0 opacity-100">
+    <div class="navbar-start">
+        <div class="dropdown">
+            <label tabindex="0" class="btn btn-ghost lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                </svg>
+            </label>
+            <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow transition-opacity duration-500 ease-out opacity-100">
+                <li><NavLink class="nav-link transition-opacity duration-500 ease-out opacity-100" href="/" Match="NavLinkMatch.All">Home</NavLink></li>
+                <li><NavLink class="nav-link transition-opacity duration-500 ease-out opacity-100 ml-2" href="chatgpt">ChatGPT 🤖</NavLink></li>
+                <li><NavLink class="nav-link transition-opacity duration-500 ease-out opacity-100 ml-2" href="dall-e">Dall-E 🖼️</NavLink></li>
+            </ul>
+        </div>
+        <NavLink class="btn btn-ghost text-xl" href="/">Video Transcriber 🤖</NavLink>
+    </div>
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+            <li><NavLink class="nav-link transition-opacity duration-500 ease-out opacity-100" href="/" Match="NavLinkMatch.All">Home</NavLink></li>
+            <li><NavLink class="nav-link transition-opacity duration-500 ease-out opacity-100 ml-2" href="chatgpt">ChatGPT 🤖</NavLink></li>
+            <li><NavLink class="nav-link transition-opacity duration-500 ease-out opacity-100 ml-2" href="dall-e">Dall-e 🖼️</NavLink></li>
+        </ul>
+    </div>
+    <div class="navbar-end">
+        @* <a class="btn">Button</a> *@
+    </div>
+</nav>
