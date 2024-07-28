@@ -118,7 +118,7 @@
 
             if (response.IsSuccessStatusCode)
             {
-                // Transcriptions = await response.Content.ReadFromJsonAsync<List<TranscriptionModel>>() ?? [];
+                Transcriptions = await response.Content.ReadFromJsonAsync<List<TranscriptionModel>>() ?? [];
                 SuccessMessage = "Video uploaded and transcribed successfully!";
             }
             else

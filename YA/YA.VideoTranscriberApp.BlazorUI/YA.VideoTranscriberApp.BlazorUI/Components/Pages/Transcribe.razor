@@ -1,9 +1,11 @@
 ﻿@page "/transcribe"
 
 
+@using System.Collections
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 @using YA.VideoTranscriberApp.BlazorUI.Client.Enums
+@using YA.VideoTranscriberApp.BlazorUI.Models
 
 @inject HttpClient HttpClient
 
@@ -14,7 +16,7 @@
         <div class="card-body">
             <h2 class="card-title mb-4">Upload Video</h2>
 
-            <EditForm Model="@model" enctype="multipart/form-data" Enhance method="post" OnSubmit="UploadVideo" FormName="transcribe-form">
+            <EditForm Model="@model" enctype="multipart/form-data" Enhance method="post" OnValidSubmit="UploadVideo" FormName="transcribe-form">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -36,7 +38,7 @@
                     <label class="label">
                         <span class="label-text">Choose a video file</span>
                     </label>
-                    <InputFile name="@model.VideoFile" class="file-input file-input-bordered w-full max-w-xs" accept="video/*"/>
+                    <InputFile name="model.VideoFile" class="file-input file-input-bordered w-full max-w-xs" accept="video/*"/>
                     <ValidationMessage For="@(() => model.VideoFile)" />
                 </div>
                 
@@ -106,7 +108,7 @@
         {
             var content = new MultipartFormDataContent();
             var fileContent = new StreamContent(model.VideoFile.OpenReadStream());
-            content.Add(fileContent, "video", model.VideoFile.Name);
+            content.Add(fileContent, "video", model.VideoFile.FileName);
 
             foreach (var language in model.SelectedLanguages)
             {
@@ -117,7 +119,7 @@
 
             if (response.IsSuccessStatusCode)
             {
-                // Transcriptions = await response.Content.ReadFromJsonAsync<List<TranscriptionModel>>() ?? [];
+                Transcriptions = await response.Content.ReadFromJsonAsync<List<TranscriptionModel>>() ?? [];
                 SuccessMessage = "Video uploaded and transcribed successfully!";
             }
             else
@@ -143,13 +145,8 @@
         public IFormFile VideoFile { get; set; }
 
         [Required(ErrorMessage = "Please select at least one language.")]
-        [MinLength(1, ErrorMessage = "Please select at least one language.")]
         public string[] SelectedLanguages { get; set; } = new string[25];
     }
 
-    public class TranscriptionModel
-    {
-        public string Language { get; set; }
-        public string Text { get; set; }
-    }
+
 }
