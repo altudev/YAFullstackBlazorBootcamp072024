@@ -1,0 +1,42 @@
+﻿@using YA.VideoTranscriberApp.BlazorUI.Client.Enums
+<button type="@Type" class="@GetCssClass" style="@CssStyles" disabled="@(IsDisabled)" @onclick="@(() => OnClick.InvokeAsync())">
+    @Text
+</button>
+
+@code {
+    [Parameter] public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = false;
+
+    [Parameter] public bool IsLoading { get; set; } = false;
+
+    [Parameter] public string CssClass { get; set; } = string.Empty;
+
+    [Parameter] public string CssStyles { get; set; } = string.Empty;
+
+    [Parameter] public ButtonStyle Style { get; set; } = ButtonStyle.Primary;
+
+    [Parameter] public ButtonSize Size { get; set; } = ButtonSize.Medium;
+
+    [Parameter]
+    public string Type { get; set; } = "button";
+
+    private string GetButtonStyle => Style.ToString().ToLowerInvariant();
+
+    private string GetCssClass => $"btn btn-{GetButtonStyle} {GetButtonSize} {CssClass}";
+
+    // Convert Button Sizes to xm, sm, md, lg, xl
+    private string GetButtonSize => Size switch
+    {
+        ButtonSize.ExtraSmall => "btn-xs",
+        ButtonSize.Small => "btn-sm",
+        ButtonSize.Medium => string.Empty,
+        ButtonSize.Large => "btn-lg",
+        _ => string.Empty
+    };
+
+}

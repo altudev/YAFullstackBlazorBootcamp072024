@@ -13,13 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VideoTranscriberApp", "Vide
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.VideoTranscriberApp.ConsoleClient", "YA.VideoTranscriberApp.ConsoleClient\YA.VideoTranscriberApp.ConsoleClient.csproj", "{C4951BE3-7D51-42F4-A7FF-8C0965AEDB58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YA.VideoTranscriberApp.BlazorUI", "YA.VideoTranscriberApp.BlazorUI\YA.VideoTranscriberApp.BlazorUI\YA.VideoTranscriberApp.BlazorUI.csproj", "{0C81CD4C-868B-461A-95E3-2E527859815F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.VideoTranscriberApp.BlazorUI", "YA.VideoTranscriberApp.BlazorUI\YA.VideoTranscriberApp.BlazorUI\YA.VideoTranscriberApp.BlazorUI.csproj", "{0C81CD4C-868B-461A-95E3-2E527859815F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YA.VideoTranscriberApp.BlazorUI.Client", "YA.VideoTranscriberApp.BlazorUI\YA.VideoTranscriberApp.BlazorUI.Client\YA.VideoTranscriberApp.BlazorUI.Client.csproj", "{901F6F4B-813A-4F4B-AFF5-015700782CD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.VideoTranscriberApp.BlazorUI.Client", "YA.VideoTranscriberApp.BlazorUI\YA.VideoTranscriberApp.BlazorUI.Client\YA.VideoTranscriberApp.BlazorUI.Client.csproj", "{901F6F4B-813A-4F4B-AFF5-015700782CD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1", "BlazorApp1\BlazorApp1\BlazorApp1.csproj", "{5CE0D295-3338-4CBC-8F47-CC0471E2B7EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp1", "BlazorApp1\BlazorApp1\BlazorApp1.csproj", "{5CE0D295-3338-4CBC-8F47-CC0471E2B7EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1.Client", "BlazorApp1\BlazorApp1.Client\BlazorApp1.Client.csproj", "{1B62E12B-A9F6-4B5E-8B03-FFD42126BE49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp1.Client", "BlazorApp1\BlazorApp1.Client\BlazorApp1.Client.csproj", "{1B62E12B-A9F6-4B5E-8B03-FFD42126BE49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

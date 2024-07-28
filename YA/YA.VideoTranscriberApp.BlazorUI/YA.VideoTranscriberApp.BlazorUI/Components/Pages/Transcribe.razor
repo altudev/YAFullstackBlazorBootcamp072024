@@ -3,6 +3,7 @@
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
+@using YA.VideoTranscriberApp.BlazorUI.Client.Enums
 
 @inject HttpClient HttpClient
 
@@ -13,7 +14,7 @@
         <div class="card-body">
             <h2 class="card-title mb-4">Upload Video</h2>
 
-            <EditForm Model="@model" enctype="multipart/form-data" Enhance method="post" OnValidSubmit="UploadVideo" FormName="trancribeForm">
+            <EditForm Model="@model" enctype="multipart/form-data" Enhance method="post" OnSubmit="UploadVideo" FormName="transcribe-form">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -35,17 +36,11 @@
                     <label class="label">
                         <span class="label-text">Choose a video file</span>
                     </label>
-                    <InputFile name="model.VideoFile" class="file-input file-input-bordered w-full max-w-xs" accept="video/*" max="" />
+                    <InputFile name="@model.VideoFile" class="file-input file-input-bordered w-full max-w-xs" accept="video/*"/>
                     <ValidationMessage For="@(() => model.VideoFile)" />
                 </div>
-
-                <button type="submit" class="btn btn-primary w-full @(IsUploading ? "loading" : "")">
-                    @if (IsUploading)
-                    {
-                        <span class="loading loading-spinner"></span>
-                    }
-                    Upload and Transcribe
-                </button>
+                
+                <DaisyButton Type="submit" Style="@ButtonStyle.Success" Text="Upload and Transcribe" CssClass="w-full" />
             </EditForm>
 
             @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -85,7 +80,7 @@
 
 @code {
 
-    [SupplyParameterFromForm]
+    [SupplyParameterFromForm(FormName = "transcribe-form")]
     private VideoUploadModel model { get; set; } = new();
     private static List<string> Languages { get; set; } = ["English", "Spanish", "French", "German", "Italian", "Portuguese", "Russian", "Chinese", "Japanese", "Korean", "Turkish"];
     private bool IsUploading { get; set; } = false;
@@ -93,15 +88,11 @@
     private string SuccessMessage { get; set; } = string.Empty;
     private List<TranscriptionModel> Transcriptions { get; set; } = [];
 
-    private void OnFileSelected(InputFileChangeEventArgs e)
-    {
-        model.VideoFile = e.File;
-        model.IsFileSelected = true;
-    }
-
     private async Task UploadVideo()
     {
-        if (model.SelectedLanguages is null || !model.SelectedLanguages.Any())
+        Console.WriteLine(JsonSerializer.Serialize(model));
+
+        if (model.VideoFile is null || string.IsNullOrEmpty(model.VideoFile.FileName) || model.SelectedLanguages is null || !model.SelectedLanguages.Any())
         {
             ErrorMessage = "Please select a file and at least one language.";
             return;
@@ -114,7 +105,7 @@
         try
         {
             var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(model.VideoFile.OpenReadStream(50000000));
+            var fileContent = new StreamContent(model.VideoFile.OpenReadStream());
             content.Add(fileContent, "video", model.VideoFile.Name);
 
             foreach (var language in model.SelectedLanguages)
@@ -149,13 +140,11 @@
     {
         [Required(ErrorMessage = "Please select a video file.")]
         [DataType(DataType.Upload)]
-        public IBrowserFile VideoFile { get; set; }
+        public IFormFile VideoFile { get; set; }
 
         [Required(ErrorMessage = "Please select at least one language.")]
         [MinLength(1, ErrorMessage = "Please select at least one language.")]
-        public string[] SelectedLanguages { get; set; } = new string[Languages.Count + 1];
-
-        public bool IsFileSelected { get; set; } = false;
+        public string[] SelectedLanguages { get; set; } = new string[25];
     }
 
     public class TranscriptionModel
