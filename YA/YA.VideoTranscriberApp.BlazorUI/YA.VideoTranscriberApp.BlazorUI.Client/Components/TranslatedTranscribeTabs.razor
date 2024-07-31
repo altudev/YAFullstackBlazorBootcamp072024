@@ -1,0 +1,79 @@
+﻿@using System.Text
+@using BlazorDownloadFile
+@using YA.VideoTranscriberApp.BlazorUI.Client.Models
+@using YA.VideoTranscriberApp.BlazorUI.Client.Pages
+@inject IBlazorDownloadFileService DownloadFileService
+
+<div class="w-full">
+    <div class="tabs tabs-lifted">
+        @foreach (var tab in Tabs)
+        {
+            <button @onclick="(() => SelectTab(tab))"
+                    class="@GetTabClass(tab)"
+                    role="tab"
+                    aria-selected="@(tab == SelectedTab)"
+                    aria-controls="tab-content-@tab.Language.ToLower()">
+                @tab.Language
+            </button>
+        }
+    </div>
+
+    <div class="bg-base-100 border-base-300 rounded-b-box border p-6 mt-[-1px]">
+        @if (SelectedTab != null)
+        {
+            <div id="tab-content-@SelectedTab.Language.ToLower()"
+                 role="tabpanel"
+                 aria-labelledby="tab-@SelectedTab.Language.ToLower()"
+                 class="space-y-4">
+                <p class="text-base-content whitespace-pre-wrap">@SelectedTab.Text</p>
+                <div class="flex justify-end">
+                    <button @onclick="(() => DownloadSrt(SelectedTab))"
+                            class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        Download .srt
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<TranscriptionModel> Tabs { get; set; } = new();
+
+    private TranscriptionModel SelectedTab { get; set; }
+
+    protected override void OnInitialized()
+    {
+        SelectedTab = Tabs.FirstOrDefault();
+    }
+
+    private void SelectTab(TranscriptionModel tab)
+    {
+        SelectedTab = tab;
+    }
+
+    private string GetTabClass(TranscriptionModel tab)
+    {
+        var baseClasses = "tab border-base-300";
+        if (tab == SelectedTab)
+        {
+            return $"{baseClasses} tab-active bg-base-100 text-primary border-b-base-100";
+        }
+        return $"{baseClasses} bg-base-200 text-base-content border-b-base-300";
+    }
+
+    private async Task DownloadSrt(TranscriptionModel tab)
+    {
+        using var memoryStream = new MemoryStream();
+
+        byte[] textBytes = Encoding.UTF8.GetBytes(tab.Text);
+
+        await memoryStream.WriteAsync(textBytes, 0, textBytes.Length);
+
+        await DownloadFileService.DownloadFile($"{tab.Language}.srt", memoryStream, "text/plain");
+    }
+}

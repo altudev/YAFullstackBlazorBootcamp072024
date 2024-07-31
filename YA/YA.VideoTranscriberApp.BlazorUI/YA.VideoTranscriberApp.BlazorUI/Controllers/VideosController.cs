@@ -3,7 +3,7 @@ using OpenAI.Interfaces;
 using OpenAI.ObjectModels;
 using OpenAI.ObjectModels.RequestModels;
 using Xabe.FFmpeg;
-using YA.VideoTranscriberApp.BlazorUI.Models;
+using YA.VideoTranscriberApp.BlazorUI.Client.Models;
 
 namespace YA.VideoTranscriberApp.BlazorUI.Controllers
 {

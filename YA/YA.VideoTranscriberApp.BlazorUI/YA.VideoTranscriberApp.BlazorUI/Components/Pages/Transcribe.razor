@@ -5,7 +5,7 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 @using YA.VideoTranscriberApp.BlazorUI.Client.Enums
-@using YA.VideoTranscriberApp.BlazorUI.Models
+@using YA.VideoTranscriberApp.BlazorUI.Client.Models
 @using YA.VideoTranscriberApp.BlazorUI.Services
 
 @inject TranscriptionManager TranscriptionManager
@@ -70,10 +70,7 @@
     {
         <div class="mt-8">
             <h2 class="text-2xl font-bold mb-4">Transcriptions</h2>
-            @foreach (var transcription in Transcriptions)
-            {
-                <TranscriptionCard Language="@transcription.Language" Text="@transcription.Text" @rendermode="InteractiveWebAssembly"/>
-            }
+            <TranslatedTranscribeTabs Tabs="Transcriptions" @rendermode="InteractiveWebAssembly"/>
         </div>
     }
 </div>

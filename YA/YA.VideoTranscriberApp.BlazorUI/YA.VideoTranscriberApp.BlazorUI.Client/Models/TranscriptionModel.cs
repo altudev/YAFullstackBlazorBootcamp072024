@@ -1,4 +1,4 @@
-﻿namespace YA.VideoTranscriberApp.BlazorUI.Models
+﻿namespace YA.VideoTranscriberApp.BlazorUI.Client.Models
 {
     public class TranscriptionModel
     {
