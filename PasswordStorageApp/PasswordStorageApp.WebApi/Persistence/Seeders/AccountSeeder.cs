@@ -1,10 +1,17 @@
-﻿using PasswordStorageApp.WebApi.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PasswordStorageApp.Domain.Models;
 
-namespace PasswordStorageApp.WebApi.Persistence
+namespace PasswordStorageApp.WebApi.Persistence.Seeders
 {
-    public static class FakeDbContext
+    public class AccountSeeder:IEntityTypeConfiguration<Account>
     {
-        public static List<Account> Accounts { get; set; } =
+        public void Configure(EntityTypeBuilder<Account> builder)
+        {
+            builder.HasData(_accounts);
+        }
+
+        private readonly List<Account> _accounts =
         [
             new Account
             {

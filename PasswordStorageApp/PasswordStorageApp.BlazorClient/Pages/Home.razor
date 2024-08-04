@@ -1,0 +1,74 @@
+﻿@page "/"
+@using PasswordStorageApp.Domain.Models
+@inject HttpClient HttpClient
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+@if (accounts is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in accounts)
+            {
+                <tr>
+                    <td>@account.Id</td>
+                    <td>@account.Username</td>
+                    <td>@account.Password</td>
+                    <td>@account.Type</td>
+                    <td>
+                        <button @onclick="@(() => HandleRemoveClick(account))" class="btn btn-danger">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+
+
+
+@code
+{
+    private List<Account> accounts = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        accounts = await HttpClient.GetFromJsonAsync<List<Account>>("Accounts");
+    }
+
+    private async Task HandleRemoveClick(Account account)
+    {
+       var response = await HttpClient.DeleteAsync($"Accounts/{account.Id}");
+
+       if (response.IsSuccessStatusCode)
+        {
+            accounts.Remove(account);
+        }
+        else
+        {
+            // Handle error
+            Console.WriteLine("There was an unexpected error occured.");
+        }
+
+        
+    }
+}
