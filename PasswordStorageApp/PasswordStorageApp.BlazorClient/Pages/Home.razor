@@ -2,41 +2,46 @@
 @using PasswordStorageApp.Domain.Dtos
 @using PasswordStorageApp.Domain.Models
 @inject HttpClient HttpClient
+@inject DialogService DialogService
+@inject NotificationService NotificationService
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Create" />
 
 @if (accounts is null)
 {
-    <p><em>Loading...</em></p>
+    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
 }
 else
 {
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Simple" AllowSorting="true" PageSize="10" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                    Data="@accounts" ColumnWidth="300px">
-        <Columns>
-            <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Id)" Title="ID" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Username)" Title="UserName" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Password)" Title="Password" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Type)" Title="Type" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.CreatedOn)" Title="Created On" TextAlign="TextAlign.Center" />
+    <RadzenCard Variant="Variant.Filled">
 
-            <RadzenDataGridColumn Title="Actions" Frozen="true" Sortable="false" Filterable="false" Width="120px" TextAlign="TextAlign.Center">
-                <Template Context="data">
-                    <RadzenStack Orientation="Orientation.Horizontal">
-                        <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="edit" />
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" />
-                    </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
+        <h3 class="text-center">Hesaplar</h3>
 
-        </Columns>
-    </RadzenDataGrid>
+        <RadzenButton Click="HandleAddClickAsync" ButtonStyle="ButtonStyle.Primary" Text="Ekle" Style="margin-bottom: 1rem;" />
+
+
+        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Simple" AllowSorting="true" PageSize="10" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                        Data="@accounts" ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Id)" Title="ID" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Username)" Title="UserName" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Password)" Title="Password" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.Type)" Title="Type" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Property="@nameof(AccountGetAllDto.CreatedOn)" Title="Created On" TextAlign="TextAlign.Center" />
+
+                <RadzenDataGridColumn Title="Actions" Frozen="true" Sortable="false" Filterable="false" Width="120px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="edit" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => HandleRemoveClickAsync(data))" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenCard>
 
 }
 
@@ -44,27 +49,60 @@ else
 
 @code
 {
-    private List<AccountGetAllDto> accounts = null;
+    private IEnumerable<AccountGetAllDto> accounts = null;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        accounts = await HttpClient.GetFromJsonAsync<List<AccountGetAllDto>>("Accounts");
+        accounts = await HttpClient.GetFromJsonAsync<IEnumerable<AccountGetAllDto>>("Accounts");
     }
 
-    private async Task HandleRemoveClick(AccountGetAllDto account)
+    private async Task HandleAddClickAsync()
     {
-        var response = await HttpClient.DeleteAsync($"Accounts/{account.Id}");
+        var result = await DialogService.OpenAsync<AccountsAdd>($"Hesap Ekle",
+             new Dictionary<string, object>() { { "IsDialog", true } },
+             new DialogOptions()
+                 {
+                     Resizable = true,
+                     Draggable = true,
+                     Width = "700px",
+                     Height = "512px",
+                 });
 
-        if (response.IsSuccessStatusCode)
+        if (result is not null && (bool)result)
         {
-            accounts.Remove(account);
+            accounts = await HttpClient.GetFromJsonAsync<IEnumerable<AccountGetAllDto>>("Accounts");
         }
-        else
+    }
+
+    private async Task HandleRemoveClickAsync(AccountGetAllDto account)
+    {
+        CancellationTokenSource cts = new CancellationTokenSource();
+
+        var result = await DialogService
+            .Confirm("Silmek istediginize emin misiniz?", "Secili Kayit Siliniyor", new ConfirmOptions() { OkButtonText = "Evet", CancelButtonText = "Hayir" });
+
+
+        if (result is not null && (bool)result)
         {
-            // Handle error
-            Console.WriteLine("There was an unexpected error occured.");
+            var response = await HttpClient.DeleteAsync($"Accounts/{account.Id}", cts.Token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                accounts = accounts.Where(ac => ac.Id != account.Id);
+
+                // await InvokeAsync(StateHasChanged);
+
+                NotificationService.Notify(NotificationSeverity.Success, "Kayit Silindi", "Secili kayit basariyla silindi.");
+            }
+            else
+            {
+                // Handle error
+                Console.WriteLine("There was an unexpected error occured.");
+
+                NotificationService.Notify(NotificationSeverity.Error, "Hata", "Kayit silinirken bir hata olustu.");
+            }
         }
 
 
