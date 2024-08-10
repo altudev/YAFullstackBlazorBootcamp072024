@@ -1,0 +1,125 @@
+﻿@page "/accounts/update/{Id:guid}"
+@using System.Net
+@using PasswordStorageApp.Domain.Dtos
+@using PasswordStorageApp.Domain.Enums
+@inject DialogService DialogService
+@inject HttpClient HttpClient
+@inject IToastService ToastService
+@inject NavigationManager Navigation
+
+@if (updateDto is null)
+{
+    <Loading/>
+}
+else
+{
+    <RadzenTemplateForm Data="@updateDto" Submit="@((AccountUpdateDto args) => SubmitAsync())">
+        <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+            <RadzenColumn Size="12" SizeMD="12">
+                <RadzenStack>
+                    <RadzenFieldset Text="Hesap Detaylari">
+                        <RadzenStack Gap="1rem">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Text="Hesap Tipi" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenDropDown @bind-Value="updateDto.Type" AllowClear="true" Placeholder="Hesap Tipini Seciniz..." Data="@accountTypes" Style="width: 100%;" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Text="Kullanici Adi" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenTextBox Style="width: 100%;" @bind-Value="updateDto.Username" Placeholder="Kullanici Adinizi Giriniz..." />
+                                </RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Text="Sifre" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenPassword Style="width: 100%;" @bind-Value="updateDto.Password" Placeholder="Sifrenizi Giriniz..." />
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenFieldset>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Kaydet" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Iptal Et" Click="@Cancel" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [Parameter] public bool IsDialog { get; set; } = false;
+
+    private AccountUpdateDto updateDto = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var response = await HttpClient.GetAsync($"Accounts/{Id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var account = await response.Content.ReadFromJsonAsync<AccountGetByIdDto>();
+
+            updateDto = account.ToUpdateDto();
+        }
+        else
+        {
+            ToastService.Warning("Guncellenecek hesap bulunamadi veya gecici bir hata olustu.", "Uyari");
+
+            if (IsDialog)
+                DialogService.Close(false);
+
+            else
+                Navigation.NavigateTo("/accounts");
+        }
+    }
+
+    private IEnumerable<AccountType> accountTypes = Enum.GetValues<AccountType>();
+
+    private async Task SubmitAsync()
+    {
+        var response = await HttpClient.PutAsJsonAsync($"Accounts/{Id}", updateDto);
+
+        if (response.IsSuccessStatusCode)
+        {
+            ToastService.Success("Hesap Guncellendi.", "Hesap basariyla guncellendi.");
+
+            if (IsDialog)
+                DialogService.Close(true);
+
+            else
+                Navigation.NavigateTo("/accounts");
+        }
+        else
+        {
+            if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.NotFound)
+            {
+                ToastService.Warning("Lutfen formu kontrol ediniz...", "Uyari");
+            }
+            else
+            {
+                ToastService.Error("Hesap eklenirken sunucu tarafinda bir hata olustu.", "Hata");
+            }
+        }
+    }
+
+    private void Cancel()
+    {
+        if (IsDialog)
+            DialogService.Close(false);
+
+        else
+            Navigation.NavigateTo("/accounts");
+    }
+}

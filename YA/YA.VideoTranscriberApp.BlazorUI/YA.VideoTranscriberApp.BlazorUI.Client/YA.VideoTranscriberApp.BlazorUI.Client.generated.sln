@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YA.VideoTranscriberApp.BlazorUI.Client", "YA.VideoTranscriberApp.BlazorUI.Client.csproj", "{A33BBA72-8358-40F7-A3FD-DD78C070636B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A33BBA72-8358-40F7-A3FD-DD78C070636B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A33BBA72-8358-40F7-A3FD-DD78C070636B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A33BBA72-8358-40F7-A3FD-DD78C070636B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A33BBA72-8358-40F7-A3FD-DD78C070636B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66A8FEDE-B741-40F7-8C72-B9758B21CC66}
+	EndGlobalSection
+EndGlobal

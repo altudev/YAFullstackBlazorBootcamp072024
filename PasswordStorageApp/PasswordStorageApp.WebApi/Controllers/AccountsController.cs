@@ -39,7 +39,7 @@ namespace PasswordStorageApp.WebApi.Controllers
             if (account is null)
                 return NotFound();
 
-            return Ok(account);
+            return Ok(AccountGetByIdDto.MapFromAccount(account));
         }
 
         [HttpPost]
