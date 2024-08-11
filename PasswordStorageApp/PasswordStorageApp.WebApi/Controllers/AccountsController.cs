@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using PasswordStorageApp.Domain.Dtos;
+using PasswordStorageApp.WebApi.Hubs;
 using PasswordStorageApp.WebApi.Persistence.Contexts;
 
 namespace PasswordStorageApp.WebApi.Controllers
@@ -10,10 +12,12 @@ namespace PasswordStorageApp.WebApi.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IHubContext<AccountsHub> _accountsHubContext;
 
-        public AccountsController(ApplicationDbContext dbContext)
+        public AccountsController(ApplicationDbContext dbContext, IHubContext<AccountsHub> accountsHubContext)
         {
             _dbContext = dbContext;
+            _accountsHubContext = accountsHubContext;
         }
 
         [HttpGet]
@@ -56,6 +60,9 @@ namespace PasswordStorageApp.WebApi.Controllers
 
             //return Ok(account.Id);
 
+            await _accountsHubContext.Clients.All
+                .SendAsync("AccountCreated", AccountGetAllDto.MapFromAccount(account), cancellationToken);
+
             return Ok(new { data = account.Id, message = "The account was added successfully!" });
         }
 
@@ -76,6 +83,9 @@ namespace PasswordStorageApp.WebApi.Controllers
             //    .Update(updatedAccount);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            await _accountsHubContext.Clients.All
+                .SendAsync("AccountUpdated", AccountGetAllDto.MapFromAccount(updatedAccount), cancellationToken);
 
             return Ok(new { data = updatedAccount, message = "The account was updated successfully!" });
         }
@@ -98,6 +108,9 @@ namespace PasswordStorageApp.WebApi.Controllers
                 .Remove(account);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            await _accountsHubContext.Clients.All
+                .SendAsync("AccountRemoved", id, cancellationToken);
 
             return NoContent();
         }

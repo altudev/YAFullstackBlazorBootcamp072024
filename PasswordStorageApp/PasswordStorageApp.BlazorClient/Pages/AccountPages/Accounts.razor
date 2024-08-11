@@ -1,4 +1,6 @@
 ﻿@page "/accounts"
+@using Microsoft.AspNetCore.Http.Connections
+@using Microsoft.AspNetCore.SignalR.Client
 @using PasswordStorageApp.Domain.Dtos
 @inject HttpClient HttpClient
 @inject DialogService DialogService
@@ -48,13 +50,58 @@ else
 
 @code
 {
+    private HubConnection hubConnection;
     private IEnumerable<AccountGetAllDto> accounts = null;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        accounts = await HttpClient.GetFromJsonAsync<IEnumerable<AccountGetAllDto>>("Accounts");
+        // accounts = await HttpClient.GetFromJsonAsync<IEnumerable<AccountGetAllDto>>("Accounts");
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://csharpjavadandahaiyi.tailwindcomponents.io/hubs/accountsHub", HttpTransportType.LongPolling)
+            .WithAutomaticReconnect()
+            .ConfigureLogging(config => config.SetMinimumLevel(LogLevel.Information))
+            .Build();
+
+        hubConnection.On<AccountGetAllDto>("AccountCreated", async (createdAccount) =>
+        {
+            accounts = accounts.Append(createdAccount);
+
+            ToastService.Info($"Farkli bir kullanici tarafindan yeni bir hesap olusturuldu. {createdAccount.Username}");
+
+            await InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<Guid>("AccountRemoved", async (deletedAccountId) =>
+        {
+            accounts = accounts.Where(ac => ac.Id != deletedAccountId);
+
+            ToastService.Info($"Farkli bir kullanici tarafindan yeni bir hesap silindi. {deletedAccountId}");
+
+            await InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<AccountGetAllDto>("AccountUpdated", async (updatedAccount) =>
+        {
+            var tempAccounts = accounts.ToList();
+
+            var updatedAccountsIndex = tempAccounts.FindIndex(ac => ac.Id == updatedAccount.Id);
+
+            tempAccounts[updatedAccountsIndex] = updatedAccount;
+
+            accounts = new List<AccountGetAllDto>(tempAccounts);
+
+            ToastService.Info($"Farkli bir kullanici tarafindan bir hesap guncellendi. {updatedAccount.Id}");
+
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+        accounts = await hubConnection.InvokeAsync<IEnumerable<AccountGetAllDto>>("GetAllAsync");
+
     }
 
     private async Task HandleAddClickAsync()
@@ -102,23 +149,29 @@ else
 
         if (result is not null && (bool)result)
         {
-            var response = await HttpClient.DeleteAsync($"Accounts/{account.Id}", cts.Token);
+            // var response = await HttpClient.DeleteAsync($"Accounts/{account.Id}", cts.Token);
 
-            if (response.IsSuccessStatusCode)
-            {
-                accounts = accounts.Where(ac => ac.Id != account.Id);
+            // if (response.IsSuccessStatusCode)
+            // {
+            //     accounts = accounts.Where(ac => ac.Id != account.Id);
 
-                // await InvokeAsync(StateHasChanged);
+            //     // await InvokeAsync(StateHasChanged);
 
-                ToastService.Success("Secili kayit basariyla silindi.","Kayit Silindi" );
-            }
-            else
-            {
-                // Handle error
-                Console.WriteLine("There was an unexpected error occured.");
+            //     ToastService.Success("Secili kayit basariyla silindi.","Kayit Silindi" );
+            // }
+            // else
+            // {
+            //     // Handle error
+            //     Console.WriteLine("There was an unexpected error occured.");
 
-                ToastService.Error("Kayit silinirken bir hata olustu.", "Hata");
-            }
+            //     ToastService.Error("Kayit silinirken bir hata olustu.", "Hata");
+            // }
+
+            await hubConnection.InvokeAsync("RemoveAsync", account.Id,cts.Token);
+
+            ToastService.Success("Secili kayit basariyla silindi.", "Kayit Silindi");
+
+            accounts = accounts.Where(ac => ac.Id != account.Id);
         }
 
 

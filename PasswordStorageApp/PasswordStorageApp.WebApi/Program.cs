@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PasswordStorageApp.WebApi.Hubs;
 using PasswordStorageApp.WebApi.Persistence.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDbContext>();
+
+builder.Services.AddSignalR();
 
 // Add Cors for all origins
 builder.Services.AddCors(options =>
@@ -53,5 +56,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<AccountsHub>("/hubs/accountsHub");
 
 app.Run();
