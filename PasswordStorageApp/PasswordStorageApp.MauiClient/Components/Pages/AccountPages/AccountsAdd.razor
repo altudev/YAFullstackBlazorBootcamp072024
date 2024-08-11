@@ -1,0 +1,94 @@
+﻿@page "/accounts/add"
+@using System.Net
+@using PasswordStorageApp.Domain.Dtos
+@using PasswordStorageApp.Domain.Enums
+@using IToastService = PasswordStorageApp.MauiClient.Services.IToastService
+@inject DialogService DialogService
+@inject HttpClient HttpClient
+@inject IToastService ToastService
+@inject NavigationManager Navigation
+
+<RadzenTemplateForm Data="@createDto" Submit="@((AccountCreateDto args) => SubmitAsync(args))">
+    <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+        <RadzenColumn Size="12" SizeMD="12">
+            <RadzenStack>
+                <RadzenFieldset Text="Hesap Detaylari">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Hesap Tipi"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenDropDown @bind-Value="createDto.Type" AllowClear="true" Placeholder="Hesap Tipini Seciniz..." Data="@accountTypes" Style="width: 100%;"/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Kullanici Adi" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenTextBox Style="width: 100%;" @bind-Value="createDto.Username" Placeholder="Kullanici Adinizi Giriniz..." />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Sifre" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenPassword Style="width: 100%;" @bind-Value="createDto.Password" Placeholder="Sifrenizi Giriniz..."/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenFieldset>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Kaydet" />
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Iptal Et" Click="@Cancel" />
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter] public bool IsDialog { get; set; } = false;
+
+    private AccountCreateDto createDto = new();
+
+    private IEnumerable<AccountType> accountTypes = Enum.GetValues<AccountType>();
+
+    private async Task SubmitAsync(AccountCreateDto accountCreateDto)
+    {
+        var response = await HttpClient.PostAsJsonAsync("Accounts", createDto);
+
+        if (response.IsSuccessStatusCode)
+        {
+            ToastService.Success("Hesap basariyla eklendi.", "Hesap Eklendi");
+
+            if(IsDialog)
+                DialogService.Close(true);
+
+            else
+                Navigation.NavigateTo("/accounts");
+        }
+        else
+        {
+            if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.NotFound)
+            {
+                ToastService.Warning("Lutfen formu kontrol ediniz...","Uyari");
+            }
+            else
+            {
+                ToastService.Error("Hesap eklenirken sunucu tarafinda bir hata olustu.", "Hata");
+            }
+        }
+    }
+
+    private void Cancel()
+    {
+        if (IsDialog)
+            DialogService.Close(false);
+
+        else
+            Navigation.NavigateTo("/accounts");
+    }
+}

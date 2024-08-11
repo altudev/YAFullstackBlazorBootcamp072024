@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using IToastService = PasswordStorageApp.MauiClient.Services.IToastService
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 
@@ -19,6 +20,6 @@ Welcome to your new app.
 
     private void HandleDangerClick()
     {
-        ToastService.ShowSuccess("MAUI HAYAT KURTARIR!");
+        ToastService.Success("MAUI HAYAT KURTARIR!");
     }
 }

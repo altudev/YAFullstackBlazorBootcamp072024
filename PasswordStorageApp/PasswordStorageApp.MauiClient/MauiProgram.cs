@@ -1,5 +1,7 @@
 ﻿using Blazored.Toast;
 using Microsoft.Extensions.Logging;
+using PasswordStorageApp.MauiClient.Services;
+using Radzen;
 
 namespace PasswordStorageApp.MauiClient
 {
@@ -18,6 +20,12 @@ namespace PasswordStorageApp.MauiClient
             builder.Services.AddMauiBlazorWebView();
 
             builder.Services.AddBlazoredToast();
+
+            builder.Services.AddRadzenComponents();
+
+            builder.Services.AddScoped<IToastService, RadzenToastManager>();
+
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://csharpjavadandahaiyi.tailwindcomponents.io/api/") });
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

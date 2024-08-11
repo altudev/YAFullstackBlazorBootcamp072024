@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using PasswordStorageApp.WebApi.Persistence.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,12 +28,25 @@ var app = builder.Build();
 
 app.UseCors();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+  
 }
+
+var cts = new CancellationTokenSource();
+
+await using var scope = app.Services.CreateAsyncScope();
+
+var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+var migrations = await context.Database.GetPendingMigrationsAsync(cts.Token);
+
+if (migrations.Any())
+    await context.Database.MigrateAsync(cts.Token);
 
 app.UseHttpsRedirection();
 
