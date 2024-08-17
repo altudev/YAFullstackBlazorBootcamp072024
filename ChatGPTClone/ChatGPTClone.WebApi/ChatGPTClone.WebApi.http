@@ -1,0 +1,6 @@
+@ChatGPTClone.WebApi_HostAddress = http://localhost:5086
+
+GET {{ChatGPTClone.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
