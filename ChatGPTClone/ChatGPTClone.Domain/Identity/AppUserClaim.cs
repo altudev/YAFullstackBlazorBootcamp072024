@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace ChatGPTClone.Domain.Identity
+namespace ChatGPTClone.Domain.Identity;
+
+public class AppUserClaim : IdentityUserClaim<Guid>
 {
-    public class AppUserClaim : IdentityUserClaim<Guid>
-    {
-    }
 }
