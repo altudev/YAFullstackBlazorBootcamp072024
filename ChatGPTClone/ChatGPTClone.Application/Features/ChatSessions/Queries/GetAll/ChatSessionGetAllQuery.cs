@@ -1,6 +1,8 @@
-﻿namespace ChatGPTClone.Application.Features.ChatSessions.Queries.GetAll
+﻿using MediatR;
+
+namespace ChatGPTClone.Application.Features.ChatSessions.Queries.GetAll
 {
-    public class ChatSessionGetAllQuery
+    public class ChatSessionGetAllQuery: IRequest<List<ChatSessionGetAllDto>>
     {
         public ChatSessionGetAllQuery()
         {
