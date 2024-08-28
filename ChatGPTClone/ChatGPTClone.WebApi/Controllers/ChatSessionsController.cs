@@ -14,7 +14,7 @@ public class ChatSessionsController : ApiControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
-        return Ok(await Mediatr.Send(new ChatSessionGetAllQuery(),cancellationToken));
+        return Ok(await Mediatr.Send(new ChatSessionGetAllQuery(), cancellationToken));
     }
 
     [HttpGet("{id}")]
