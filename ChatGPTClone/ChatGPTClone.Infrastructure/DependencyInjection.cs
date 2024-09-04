@@ -1,6 +1,9 @@
 ﻿using ChatGPTClone.Application.Common.Interfaces;
 using ChatGPTClone.Domain.Settings;
+using ChatGPTClone.Infrastructure.Identity;
 using ChatGPTClone.Infrastructure.Persistence.Contexts;
+using ChatGPTClone.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +27,24 @@ namespace ChatGPTClone.Infrastructure
 
             // JWT ayarlarını yapılandırır
             ConfigureJwtSettings(services, configuration);
+
+            services.AddScoped<IJwtService, JwtManager>();
+
+            services.AddScoped<IIdentityService, IdentityManager>();
+
+            services.AddIdentity<AppUser, Role>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequiredLength = 6;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             return services;
         }
