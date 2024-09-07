@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Resend;
 
 namespace ChatGPTClone.Infrastructure
 {
@@ -32,6 +33,8 @@ namespace ChatGPTClone.Infrastructure
 
             services.AddScoped<IIdentityService, IdentityManager>();
 
+            services.AddScoped<IEmailService, ResendEmailManager>();
+
             services.AddIdentity<AppUser, Role>(options =>
             {
                 options.User.RequireUniqueEmail = true;
@@ -45,6 +48,15 @@ namespace ChatGPTClone.Infrastructure
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+            // Resend
+            services.AddOptions();
+
+            services.AddHttpClient<ResendClient>();
+
+            services.Configure<ResendClientOptions>(o => o.ApiToken = configuration.GetSection("ResendApiKey").Value!);
+
+            services.AddTransient<IResend, ResendClient>();
 
             return services;
         }

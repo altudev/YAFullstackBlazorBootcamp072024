@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        /* Ensures the email renders well on mobile devices */
+        @media only screen and (max-width: 600px) {
+            .content {
+                width: 100% !important;
+            }
+
+            .footer {
+                padding: 20px 10px !important;
+            }
+        }
+    </style>
+</head>
+
+<body
+    style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; height: 100%; background-color: #f4f4f4;">
+    <!-- Wrapper to center content both vertically and horizontally -->
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" height="100%"
+        style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" valign="middle">
+                <!-- Main content table -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="content"
+                    style="background-color: #ffffff;">
+                    <tr>
+                        <td style="background-color: #8431AD; padding: 40px; text-align: center;">
+                            <img src="https://i.hizliresim.com/jr62e8z.png" alt="Profile"
+                                style="width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 5px solid rgba(255,255,255,0.3); margin-bottom: 20px; display: inline-block;">
+                            <h2 style="color: #ffffff; font-size: 22px; margin: 0 0 20px 0;">{{greetings}}</h2>
+                            <p style="color: #ffffff; font-size: 16px; line-height: 24px; margin: 0 0 20px 0;">
+                                {{message}}</p>
+                            <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{verifyButtonLink}}" style="height:40px;v-text-anchor:middle;width:200px;" arcsize="10%" stroke="f" fillcolor="#ffffff">
+                <w:anchorlock/>
+                <center>
+              <![endif]-->
+                            <a href="{{verifyButtonLink}}"
+                                style="background-color: #ffffff; border-radius: 4px; color: #8431AD; display: inline-block; font-size: 16px; font-weight: bold; line-height: 40px; text-align: center; text-decoration: none; width: 200px; -webkit-text-size-adjust: none;">{{verifyButtonText}}</a>
+                            <!--[if mso]>
+                </center>
+              </v:roundrect>
+              <![endif]-->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="footer"
+                            style="padding: 30px 40px; text-align: center; font-size: 14px; color: #77838F;">
+                            <a href="#" style="color: #77838F; text-decoration: none; margin: 0 10px;">Our Privacy
+                                Policy</a>
+                            <a href="#" style="color: #77838F; text-decoration: none; margin: 0 10px;">Cookies</a>
+                            <a href="#" style="color: #77838F; text-decoration: none; margin: 0 10px;">Contact</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

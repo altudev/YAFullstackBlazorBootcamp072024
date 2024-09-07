@@ -1,7 +1,9 @@
 using ChatGPTClone.Application;
+using ChatGPTClone.Application.Common.Interfaces;
 using ChatGPTClone.Infrastructure;
 using ChatGPTClone.WebApi;
 using ChatGPTClone.WebApi.Filters;
+using ChatGPTClone.WebApi.Services;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -37,7 +39,7 @@ try
 
     builder.Services.AddInfrastructure(builder.Configuration);
 
-    builder.Services.AddWebApi(builder.Configuration);
+    builder.Services.AddWebApi(builder.Configuration, builder.Environment);
 
     var app = builder.Build();
 
@@ -71,4 +73,9 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
+}
+
+Func<IServiceProvider, object> EnvironmentManager(string webRootPath)
+{
+    throw new NotImplementedException();
 }
