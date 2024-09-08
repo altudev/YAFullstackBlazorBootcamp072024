@@ -3,10 +3,13 @@ using ChatGPTClone.Application.Features.ChatSessions.Queries.GetAll;
 using ChatGPTClone.Application.Features.ChatSessions.Queries.GetById;
 using ChatGPTClone.WebApi.Filters;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
 namespace ChatGPTClone.WebApi.Controllers;
+
+[Authorize]
 public class ChatSessionsController : ApiControllerBase
 {
     private readonly IStringLocalizer<GlobalExceptionFilter> _localizer;
@@ -21,6 +24,7 @@ public class ChatSessionsController : ApiControllerBase
         return Ok(await Mediatr.Send(new ChatSessionGetAllQuery(), cancellationToken));
     }
 
+    [Authorize(Roles = "Admin,User,AlperHocam")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {

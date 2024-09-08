@@ -1,5 +1,7 @@
 using ChatGPTClone.Application.Features.Auth.Commands.Login;
 using ChatGPTClone.Application.Features.Auth.Commands.Register;
+using ChatGPTClone.Application.Features.Auth.Commands.ReSendEmailVerificationEmail;
+using ChatGPTClone.Application.Features.Auth.Commands.VerifyEmail;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +21,14 @@ namespace ChatGPTClone.WebApi.Controllers
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(AuthRegisterCommand command, CancellationToken cancellationToken)
+        => Ok(await Mediatr.Send(command, cancellationToken));
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail(AuthVerifyEmailCommand command, CancellationToken cancellationToken)
+        => Ok(await Mediatr.Send(command, cancellationToken));
+
+        [HttpPost("resend-email-verification")]
+        public async Task<IActionResult> ResendEmailVerification(AuthReSendEmailVerificationEmailCommand command, CancellationToken cancellationToken)
         => Ok(await Mediatr.Send(command, cancellationToken));
     }
 }
