@@ -115,9 +115,9 @@ public class IdentityManager : IIdentityService
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
 
-        var decodedToken = HttpUtility.UrlDecode(request.Token);
+        // var decodedToken = HttpUtility.UrlDecode(request.Token);
 
-        var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+        var result = await _userManager.ConfirmEmailAsync(user, request.Token);
 
         if (!result.Succeeded)
             CreateAndThrowValidationException(result.Errors);

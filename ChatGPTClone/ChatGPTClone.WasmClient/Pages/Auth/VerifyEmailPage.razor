@@ -1,0 +1,109 @@
+﻿@page "/auth/verify-email"
+@using System.ComponentModel.DataAnnotations
+@using ChatGPTClone.Domain.Enums
+@using System.Web
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+@if (isLoading)
+{
+    <div class="flex justify-center items-center h-screen">
+        <div class="spinner spinner-primary"></div>
+        <p class="text-lg font-medium ml-4">E-posta adresiniz doğrulanıyor...</p>
+    </div>
+}
+else
+{
+    @if (isSuccess)
+    {
+        <div class="flex justify-center items-center h-screen">
+            <div class="alert alert-success shadow-lg animate-pulse">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="ml-2">E-posta adresiniz başarıyla doğrulandı! 🎉</span>
+                </div>
+                <p class="mt-2">10 saniye içinde giriş sayfasına yönlendirileceksiniz...</p>
+
+                <div class="spinner spinner-primary mt-1"></div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-error shadow-lg">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>E-posta adresinizi doğrulama işlemi başarısız oldu!</span>
+            </div>
+        </div>
+    }
+}
+
+@code {
+
+    [Parameter, SupplyParameterFromQuery(Name = "email")]
+    public string Email { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "token")]
+    public string Token { get; set; }
+
+    private bool isLoading = true;
+    private bool isSuccess = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        // Backend'e istek yapılacak kısım buraya gelecek.
+
+        try
+        {
+            // İşlem sonucuna göre isSuccess değişkeni güncellenecek.
+            var formModel = new FormModel
+                {
+                    Email = Email,
+                    Token = Token
+                };
+
+            var response = await HttpClient.PostAsJsonAsync("Auth/verify-email", formModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                isSuccess = true;
+                isLoading = false;
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(10000); // 10 saniye bekle
+                NavigationManager.NavigateTo("/auth/login");
+            }
+            else
+            {
+                isSuccess = false;
+                isLoading = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    protected class FormModel
+    {
+        [Required]
+        public string Email { get; set; }
+
+        [Required]
+        public string Token { get; set; }
+    }
+}

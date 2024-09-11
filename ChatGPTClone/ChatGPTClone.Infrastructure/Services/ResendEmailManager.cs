@@ -35,7 +35,7 @@ public class ResendEmailManager : IEmailService
 
         var token = HttpUtility.UrlEncode(emailVerificationDto.Token);
 
-        var emailVerificationUrl = $"http://localhost:5086/auth/verify-email?email={emailVerificationDto.Email}&token={token}";
+        var emailVerificationUrl = $"http://localhost:5253/auth/verify-email?email={emailVerificationDto.Email}&token={token}";
 
         html = html.Replace("{{verifyButtonLink}}", emailVerificationUrl);
 
