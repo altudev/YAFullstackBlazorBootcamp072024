@@ -24,7 +24,6 @@ public class ChatSessionsController : ApiControllerBase
         return Ok(await Mediatr.Send(new ChatSessionGetAllQuery(), cancellationToken));
     }
 
-    [Authorize(Roles = "Admin,User,AlperHocam")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {

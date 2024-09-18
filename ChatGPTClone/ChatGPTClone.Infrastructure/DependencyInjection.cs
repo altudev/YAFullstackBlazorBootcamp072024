@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenAI.Extensions;
 using Resend;
 
 namespace ChatGPTClone.Infrastructure
@@ -26,14 +27,18 @@ namespace ChatGPTClone.Infrastructure
             // IApplicationDbContext'i ApplicationDbContext ile eşler
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
+            services.AddOpenAIService(settings => settings.ApiKey = configuration.GetSection("OpenAiApiKey").Value!);
+
             // JWT ayarlarını yapılandırır
-            ConfigureJwtSettings(services, configuration);
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
             services.AddScoped<IJwtService, JwtManager>();
 
             services.AddScoped<IIdentityService, IdentityManager>();
 
             services.AddScoped<IEmailService, ResendEmailManager>();
+
+            services.AddScoped<IOpenAiService, OpenAiManager>();
 
             services.AddIdentity<AppUser, Role>(options =>
             {
@@ -60,34 +65,5 @@ namespace ChatGPTClone.Infrastructure
 
             return services;
         }
-
-        // JWT ayarlarını yapılandıran özel metod
-        private static void ConfigureJwtSettings(IServiceCollection services, IConfiguration configuration)
-        {
-            // Yapılandırmadan JWT ayarları bölümünü alır
-            var jwtSettingsSection = configuration.GetSection("JwtSettings");
-
-            // Eğer JWT ayarları yapılandırmada mevcutsa, bu ayarları kullanır
-            if (jwtSettingsSection.Exists())
-            {
-                services.Configure<JwtSettings>(jwtSettingsSection);
-            }
-            // Aksi takdirde, varsayılan değerlerle JWT ayarlarını yapılandırır
-            else
-            {
-                services.Configure<JwtSettings>(options =>
-                {
-                    options.SecretKey = "default-secret-key-for-development-only";
-                    options.AccessTokenExpiration = TimeSpan.FromMinutes(30);
-                    options.RefreshTokenExpiration = TimeSpan.FromDays(7);
-                    options.Issuer = "ChatGPTClone";
-                    options.Audience = "ChatGPTClone";
-                });
-            }
-        }
-
-
-
-
     }
 }

@@ -16,7 +16,7 @@ namespace ChatGPTClone.WebApi.Services
 
         private Guid GetUserId()
         {
-            return Guid.Parse("2798212b-3e5d-4556-8629-a64eb70da4a8");
+            // return Guid.Parse("2798212b-3e5d-4556-8629-a64eb70da4a8");
 
             var userId = _httpContextAccessor
                 .HttpContext?
