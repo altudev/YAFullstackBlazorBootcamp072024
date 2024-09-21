@@ -1,9 +1,7 @@
 using ChatGPTClone.Application;
-using ChatGPTClone.Application.Common.Interfaces;
 using ChatGPTClone.Infrastructure;
 using ChatGPTClone.WebApi;
 using ChatGPTClone.WebApi.Filters;
-using ChatGPTClone.WebApi.Services;
 using Microsoft.Extensions.Options;
 using Serilog;
 
