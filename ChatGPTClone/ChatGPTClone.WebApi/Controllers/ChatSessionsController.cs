@@ -1,4 +1,6 @@
 ﻿using ChatGPTClone.Application.Features.ChatSessions.Commands.Create;
+using ChatGPTClone.Application.Features.ChatSessions.Commands.CreateRange;
+using ChatGPTClone.Application.Features.ChatSessions.Commands.Remove;
 using ChatGPTClone.Application.Features.ChatSessions.Queries.GetAll;
 using ChatGPTClone.Application.Features.ChatSessions.Queries.GetById;
 using ChatGPTClone.WebApi.Filters;
@@ -35,4 +37,15 @@ public class ChatSessionsController : ApiControllerBase
     {
         return Ok(await Mediatr.Send(command, cancellationToken));
     }
+
+    [HttpPost("range")]
+    public async Task<IActionResult> CreateRangeAsync(ChatSessionCreateRangeCommand command, CancellationToken cancellationToken)
+    {
+        return Ok(await Mediatr.Send(command, cancellationToken));
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> RemoveAsync(Guid id, CancellationToken cancellationToken) =>
+     Ok(await Mediatr.Send(new ChatSessionRemoveCommand(id), cancellationToken));
+
 }

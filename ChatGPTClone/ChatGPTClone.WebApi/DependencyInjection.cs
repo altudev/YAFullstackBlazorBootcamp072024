@@ -13,7 +13,8 @@ namespace ChatGPTClone.WebApi
     {
         public static IServiceCollection AddWebApi(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
         {
-            // Tuna bozmasin diye buraya yazdim.
+
+            services.AddMemoryCache();
 
             services.AddCors(options =>
                         {

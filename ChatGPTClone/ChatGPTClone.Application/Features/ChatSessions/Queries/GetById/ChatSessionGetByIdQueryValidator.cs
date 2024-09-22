@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatGPTClone.Application.Features.ChatSessions.Queries.GetById
 {
-    public class ChatSessionGetByIdQueryValidator:AbstractValidator<ChatSessionGetByIdQuery>
+    public class ChatSessionGetByIdQueryValidator : AbstractValidator<ChatSessionGetByIdQuery>
     {
         private readonly IApplicationDbContext _dbContext;
+        private readonly ICurrentUserService _currentUserService;
 
-        public ChatSessionGetByIdQueryValidator(IApplicationDbContext dbContext)
+        public ChatSessionGetByIdQueryValidator(IApplicationDbContext dbContext, ICurrentUserService currentUserService)
         {
             _dbContext = dbContext;
-
+            _currentUserService = currentUserService;
             RuleFor(p => p.Id)
                 .NotEmpty()
                 .NotNull()
@@ -23,7 +24,7 @@ namespace ChatGPTClone.Application.Features.ChatSessions.Queries.GetById
         {
             return _dbContext
                 .ChatSessions
-                .AnyAsync(x => x.Id == id, cancellationToken);
+                .AnyAsync(x => x.Id == id && x.AppUserId == _currentUserService.UserId, cancellationToken);
         }
     }
 }
