@@ -1,18 +1,16 @@
 ﻿using ChatGPTClone.Application.Common.Interfaces;
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 
 namespace ChatGPTClone.Application.Features.ChatSessions.Queries.GetById
 {
     public class ChatSessionGetByIdQueryValidator : AbstractValidator<ChatSessionGetByIdQuery>
     {
-        private readonly IApplicationDbContext _dbContext;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly IChatSessionCacheService _chatSessionCacheService;
 
-        public ChatSessionGetByIdQueryValidator(IApplicationDbContext dbContext, ICurrentUserService currentUserService)
+        public ChatSessionGetByIdQueryValidator(IChatSessionCacheService chatSessionCacheService)
         {
-            _dbContext = dbContext;
-            _currentUserService = currentUserService;
+            _chatSessionCacheService = chatSessionCacheService;
+
             RuleFor(p => p.Id)
                 .NotEmpty()
                 .NotNull()
@@ -22,9 +20,7 @@ namespace ChatGPTClone.Application.Features.ChatSessions.Queries.GetById
 
         private Task<bool> BeValidIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return _dbContext
-                .ChatSessions
-                .AnyAsync(x => x.Id == id && x.AppUserId == _currentUserService.UserId, cancellationToken);
+            return _chatSessionCacheService.ExistsAsync(id, cancellationToken);
         }
     }
 }

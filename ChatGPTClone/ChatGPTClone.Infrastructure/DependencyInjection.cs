@@ -40,6 +40,8 @@ namespace ChatGPTClone.Infrastructure
 
             services.AddScoped<IOpenAiService, OpenAiManager>();
 
+            services.AddScoped<IChatSessionCacheService, ChatSessionCacheManager>();
+
             services.AddIdentity<AppUser, Role>(options =>
             {
                 options.User.RequireUniqueEmail = true;
