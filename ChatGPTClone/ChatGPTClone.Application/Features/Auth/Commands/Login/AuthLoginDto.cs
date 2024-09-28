@@ -1,4 +1,5 @@
-﻿using ChatGPTClone.Application.Common.Models.Identity;
+﻿using System.Text.Json.Serialization;
+using ChatGPTClone.Application.Common.Models.Identity;
 
 namespace ChatGPTClone.Application.Features.Auth.Commands.Login
 {
@@ -6,6 +7,11 @@ namespace ChatGPTClone.Application.Features.Auth.Commands.Login
     {
         public string Token { get; set; }
         public DateTime ExpiresAt { get; set; }
+
+        public AuthLoginDto()
+        {
+
+        }
 
         public AuthLoginDto(string token, DateTime expiresAt)
         {

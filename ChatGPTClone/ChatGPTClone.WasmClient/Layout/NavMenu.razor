@@ -1,26 +1,46 @@
-﻿<div class="flex">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="flex">
     <!-- Sidebar -->
     <div class="bg-gray-800 text-white w-64 fixed h-screen flex flex-col">
         <div class="p-4">
             <a class="text-xl font-bold" href="">ChatGPTClone</a>
         </div>
+
         <nav class="flex-1 overflow-y-auto">
-            <div class="p-2">
-                <NavLink class="navlink block py-2 px-4 hover:bg-gray-700" href="" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill inline-block mr-2"></span> Home
-                </NavLink>
-            </div>
-            <div class="p-2">
-                <NavLink class="block py-2 px-4 hover:bg-gray-700" href="counter">
-                    <span class="bi bi-plus-square-fill inline-block mr-2"></span> Counter
-                </NavLink>
-            </div>
-            <div class="p-2">
-                <NavLink class="block py-2 px-4 hover:bg-gray-700" href="weather">
-                    <span class="bi bi-list-nested inline-block mr-2"></span> Weather
-                </NavLink>
-            </div>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="p-2">
+                        <NavLink class="navlink block py-2 px-4 hover:bg-gray-700" href="" Match="NavLinkMatch.All">
+                            <span class="bi bi-house-door-fill inline-block mr-2"></span> Home
+                        </NavLink>
+                    </div>
+                    <div class="p-2">
+                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="counter">
+                            <span class="bi bi-plus-square-fill inline-block mr-2"></span> Counter
+                        </NavLink>
+                    </div>
+                    <div class="p-2">
+                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="weather">
+                            <span class="bi bi-list-nested inline-block mr-2"></span> Weather
+                        </NavLink>
+                    </div>
+                    <div class="p-2">
+                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="auth/logout">
+                            <span class="bi bi-list-nested inline-block mr-2"></span> Logout
+                        </NavLink>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="p-2">
+                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="auth/login">
+                            <span class="bi bi-lock-fill inline-block mr-2"></span> Login
+                        </NavLink>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
         </nav>
+
     </div>
 
 

@@ -1,7 +1,90 @@
 ﻿@page "/auth/login"
+@using System.ComponentModel.DataAnnotations
+@using Blazored.LocalStorage
+@using ChatGPTClone.Application.Common.Models.General
+@using ChatGPTClone.Application.Features.Auth.Commands.Login
+@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h3>LoginPage</h3>
+<div class="hero min-h-screen bg-base-200">
+    <div class="hero-content flex-col lg:flex-row-reverse">
+        <div class="text-center lg:text-left">
+            <h1 class="text-5xl font-bold">Login now!</h1>
+            <p class="py-6">Welcome back! Please enter your credentials to access your account.</p>
+        </div>
+        <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+            <EditForm Model="@formModel" class="card-body" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <InputText @bind-Value="formModel.Email" class="input input-bordered" />
+                    <ValidationMessage For="@(() => formModel.Email)" />
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <InputText @bind-Value="formModel.Password" type="password" class="input input-bordered" />
+                    <ValidationMessage For="@(() => formModel.Password)" />
+                    <label class="label">
+                        <a href="#" class="label-text-alt link link-hover">Forgot password?</a>
+                    </label>
+                </div>
+                <div class="form-control mt-6">
+                    <button class="btn btn-primary">Login</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
 
 @code {
+    public FormModel formModel = new();
 
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PostAsJsonAsync("Auth/login", formModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var authLoginDto = await response.Content.ReadFromJsonAsync<ResponseDto<AuthLoginDto>>();
+
+            await LocalStorage.SetItemAsync("user-token", authLoginDto.Data.Token);
+
+            // Trigger authentication state changed event
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ResponseDto<AuthLoginDto>>();
+
+            if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.Message))
+            {
+                // Display the error message to the user
+                // You might want to add a property to your component to hold this error message
+                // and display it in the UI
+                Console.WriteLine($"Login failed: {errorResponse.Message}");
+            }
+            else
+            {
+                Console.WriteLine("An unexpected error occurred during login.");
+            }
+        }
+    }
+
+    public class FormModel
+    {
+        [Required, EmailAddress, MinLength(3), MaxLength(100)]
+        public string Email { get; set; } = "alper.tunga@yazilim.academy";
+
+        [Required, DataType(DataType.Password), MinLength(3), MaxLength(50)]
+        public string Password { get; set; } = "123alper123";
+    }
 }

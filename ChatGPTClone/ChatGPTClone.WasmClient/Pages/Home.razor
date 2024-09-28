@@ -1,62 +1,72 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Authorization
 
 <PageTitle>Todo App</PageTitle>
 
-<div class="container mt-4">
-    <h1 class="mb-4">Todo App</h1>
+<AuthorizeView>
+    <Authorized>
+        <div class="container mt-4">
+            <h1 class="mb-4">Todo App</h1>
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <input type="text" class="form-control" placeholder="New todo" @bind="newTodoText"
-                @onkeyup="AddTodoOnKeyUp" />
-        </div>
-        <div class="col-md-6 mb-3">
-            <button class="btn btn-primary w-100" @onclick="AddTodo">Add Todo</button>
-        </div>
-    </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <input type="text" class="form-control" placeholder="New todo" @bind="newTodoText"
+                        @onkeyup="AddTodoOnKeyUp" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <button class="btn btn-primary w-100" @onclick="AddTodo">Add Todo</button>
+                </div>
+            </div>
 
-    @if (todos.Any())
-    {
-        <ul class="list-group mt-3">
-            @foreach (var todo in todos)
+            @if (todos.Any())
             {
-                <li class="list-group-item">
-                    <div class="row align-items-center">
-                        <div class="col-12 col-md-6 mb-2 mb-md-0">
-                            @if (editingTodo == todo)
-                            {
-                                <input type="text" class="form-control" @bind="todo.Text" @onblur="() => FinishEdit()"
-                                    @onkeyup="(e) => HandleEditKeyUp(e)" />
-                            }
-                            else
-                            {
-                                <span class="@(todo.IsCompleted ? "text-decoration-line-through" : "")">@todo.Text</span>
-                            }
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="d-flex flex-wrap justify-content-end">
-                                <button class="btn btn-sm btn-outline-primary me-1 mb-1" @onclick="() => ToggleComplete(todo)">
-                                    @(todo.IsCompleted ? "Undo" : "Complete")
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary me-1 mb-1" @onclick="() => StartEdit(todo)">
-                                    Edit
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger mb-1" @onclick="() => DeleteTodo(todo)">
-                                    Delete
-                                </button>
+                <ul class="list-group mt-3">
+                    @foreach (var todo in todos)
+                    {
+                        <li class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-12 col-md-6 mb-2 mb-md-0">
+                                    @if (editingTodo == todo)
+                                    {
+                                        <input type="text" class="form-control" @bind="todo.Text" @onblur="() => FinishEdit()"
+                                            @onkeyup="(e) => HandleEditKeyUp(e)" />
+                                    }
+                                    else
+                                    {
+                                        <span class="@(todo.IsCompleted ? "text-decoration-line-through" : "")">@todo.Text</span>
+                                    }
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="d-flex flex-wrap justify-content-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1 mb-1"
+                                            @onclick="() => ToggleComplete(todo)">
+                                            @(todo.IsCompleted ? "Undo" : "Complete")
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1 mb-1"
+                                            @onclick="() => StartEdit(todo)">
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger mb-1" @onclick="() => DeleteTodo(todo)">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </li>
+                        </li>
+                    }
+                </ul>
             }
-        </ul>
-    }
-    else
-    {
-        <p class="mt-3">No todos yet. Add one above!</p>
-    }
-</div>
+            else
+            {
+                <p class="mt-3">No todos yet. Add one above!</p>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <p> Giriş yapmaniz gerekmektedir. </p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private List<TodoItem> todos = new List<TodoItem>();
