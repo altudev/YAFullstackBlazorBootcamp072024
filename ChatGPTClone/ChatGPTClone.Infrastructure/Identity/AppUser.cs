@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ChatGPTClone.Infrastructure.Identity;
 
-public class AppUser:IdentityUser<Guid>, IEntity, ICreatedByEntity, IModifiedByEntity
+public class AppUser : IdentityUser<Guid>, IEntity<Guid>, ICreatedByEntity, IModifiedByEntity
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }

@@ -10,6 +10,8 @@ namespace ChatGPTClone.Application.Common.Interfaces
 
         Task<bool> CheckIfEmailVerifiedAsync(string email, CancellationToken cancellationToken);
 
+        Task<bool> CheckSecurityStampAsync(Guid userId, string securityStamp, CancellationToken cancellationToken);
+
         Task<IdentityRegisterResponse> RegisterAsync(IdentityRegisterRequest request, CancellationToken cancellationToken);
         Task<IdentityLoginResponse> LoginAsync(IdentityLoginRequest request, CancellationToken cancellationToken);
         Task<IdentityVerifyEmailResponse> VerifyEmailAsync(IdentityVerifyEmailRequest request, CancellationToken cancellationToken);

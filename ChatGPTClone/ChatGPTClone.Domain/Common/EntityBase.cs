@@ -1,8 +1,8 @@
 ﻿namespace ChatGPTClone.Domain.Common;
 
-public abstract class EntityBase:IEntity,ICreatedByEntity,IModifiedByEntity
+public abstract class EntityBase<TKey> : IEntity<TKey>, ICreatedByEntity, IModifiedByEntity
 {
-    public virtual Guid Id { get; set; }
+    public virtual TKey Id { get; set; }
 
     public virtual DateTimeOffset CreatedOn { get; set; }
     public virtual string CreatedByUserId { get; set; }

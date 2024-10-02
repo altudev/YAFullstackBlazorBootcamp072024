@@ -4,7 +4,7 @@ using ChatGPTClone.Domain.ValueObjects;
 
 namespace ChatGPTClone.Domain.Entities;
 
-public sealed class ChatSession:EntityBase
+public sealed class ChatSession : EntityBase<Guid>
 {
     public string Title { get; set; }
     public GptModelType Model { get; set; }

@@ -6,9 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatGPTClone.Infrastructure.Persistence.Contexts;
 
-public class ApplicationDbContext:IdentityDbContext<AppUser,Role,Guid,AppUserClaim,AppUserRole,AppUserLogin,RoleClaim,AppUserToken>, IApplicationDbContext
+public class ApplicationDbContext : IdentityDbContext<AppUser, Role, Guid, AppUserClaim, AppUserRole, AppUserLogin, RoleClaim, AppUserToken>, IApplicationDbContext
 {
     public DbSet<ChatSession> ChatSessions { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {

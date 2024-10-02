@@ -23,7 +23,7 @@ public class UserConfiguration : IEntityTypeConfiguration<AppUser>
         // Limit the size of columns to use efficient database types
         builder.Property(u => u.UserName).HasMaxLength(100);
         builder.Property(u => u.NormalizedUserName).HasMaxLength(100);
-            
+
         //Email
         builder.Property(u => u.Email).IsRequired();
         builder.HasIndex(user => user.Email).IsUnique();
@@ -53,6 +53,11 @@ public class UserConfiguration : IEntityTypeConfiguration<AppUser>
 
         // Each User can have many ChatSessions
         builder.HasMany<ChatSession>()
+            .WithOne()
+            .HasForeignKey(x => x.AppUserId);
+
+        // Each User can have many RefreshTokens
+        builder.HasMany<RefreshToken>()
             .WithOne()
             .HasForeignKey(x => x.AppUserId);
 

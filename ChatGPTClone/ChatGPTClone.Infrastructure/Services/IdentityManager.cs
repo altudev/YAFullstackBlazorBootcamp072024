@@ -49,6 +49,13 @@ public class IdentityManager : IIdentityService
         .AnyAsync(x => x.Email == email && x.EmailConfirmed, cancellationToken);
     }
 
+    public async Task<bool> CheckSecurityStampAsync(Guid userId, string securityStamp, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        return string.Equals(securityStamp, user.SecurityStamp);
+    }
+
     public async Task<IdentityCreateEmailTokenResponse> CreateEmailTokenAsync(IdentityCreateEmailTokenRequest request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
