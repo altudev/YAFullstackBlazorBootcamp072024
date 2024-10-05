@@ -2,11 +2,14 @@
 using ChatGPTClone.Application.Common.Interfaces;
 using ChatGPTClone.Application.Common.Models.Identity;
 using ChatGPTClone.Application.Common.Models.Jwt;
+using ChatGPTClone.Domain.Entities;
+using ChatGPTClone.Domain.Settings;
 using ChatGPTClone.Infrastructure.Identity;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace ChatGPTClone.Infrastructure.Services;
 
@@ -14,11 +17,18 @@ public class IdentityManager : IIdentityService
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly IJwtService _jwtService;
+    private readonly JwtSettings _jwtSettings;
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public IdentityManager(UserManager<AppUser> userManager, IJwtService jwtService)
+
+    public IdentityManager(UserManager<AppUser> userManager, IJwtService jwtService, IOptions<JwtSettings> jwtSettings, IApplicationDbContext context, ICurrentUserService currentUserService)
     {
         _userManager = userManager;
         _jwtService = jwtService;
+        _context = context;
+        _jwtSettings = jwtSettings.Value;
+        _currentUserService = currentUserService;
     }
 
     // Kullanıcının kimliğini doğrular.
@@ -80,8 +90,33 @@ public class IdentityManager : IIdentityService
         // JWT oluştur.
         var jwtResponse = _jwtService.GenerateToken(jwtRequest);
 
+        // Refresh token oluştur.
+        var refreshToken = await CreateRefreshTokenAsync(user, cancellationToken);
+
         // Giriş yanıtını döndür.
-        return new IdentityLoginResponse(jwtResponse.Token, jwtResponse.ExpiresAt);
+        return new IdentityLoginResponse(jwtResponse.Token, jwtResponse.ExpiresAt, refreshToken.Token, refreshToken.Expires);
+    }
+
+    public async Task<IdentityRefreshTokenResponse> RefreshTokenAsync(IdentityRefreshTokenRequest request, CancellationToken cancellationToken)
+    {
+        var userId = _jwtService.GetUserIdFromJwt(request.AccessToken);
+
+        // Kullanıcıyı ID'sine göre bul.
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        // _collection.FindOne
+
+        // Kullanıcının rollerini al.
+        var roles = await _userManager.GetRolesAsync(user);
+
+        // JWT oluşturma isteği oluştur.
+        var jwtRequest = new JwtGenerateTokenRequest(user.Id, user.Email, roles);
+
+        // JWT oluştur.
+        var jwtResponse = _jwtService.GenerateToken(jwtRequest);
+
+        // Giriş yanıtını döndür.
+        return new IdentityRefreshTokenResponse(jwtResponse.Token, jwtResponse.ExpiresAt);
     }
 
     // Yeni bir kullanıcı kaydeder.
@@ -142,5 +177,25 @@ public class IdentityManager : IIdentityService
 
         // Doğrulama hatasını fırlat.
         throw new ValidationException(errorMessages);
+    }
+
+    private async Task<RefreshToken> CreateRefreshTokenAsync(AppUser user, CancellationToken cancellationToken)
+    {
+        var refreshToken = new RefreshToken
+        {
+            CreatedByUserId = user.Id.ToString(),
+            CreatedOn = DateTimeOffset.UtcNow,
+            AppUserId = user.Id,
+            Token = Ulid.NewUlid().ToString(), // Rastegele token oluştur.
+            Expires = DateTime.UtcNow.Add(_jwtSettings.RefreshTokenExpiration), // Refresh tokenın süresini belirler.
+            SecurityStamp = user.SecurityStamp, // Kullanıcının güvenlik damgasını kullanır.
+            CreatedByIp = _currentUserService.IpAddress, // İp adresini kullanır.
+        };
+
+        await _context.RefreshTokens.AddAsync(refreshToken, cancellationToken);
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return refreshToken;
     }
 }

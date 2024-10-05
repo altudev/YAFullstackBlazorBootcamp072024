@@ -1,6 +1,8 @@
 ﻿@page "/counter"
+@using ChatGPTClone.Application.Features.ChatSessions.Queries.GetAll
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+@inject HttpClient Http
 
 <PageTitle>Counter</PageTitle>
 
@@ -12,6 +14,18 @@
 
 @code {
     private int currentCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync("ChatSessions/");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var chatSessions = await response.Content.ReadFromJsonAsync<List<ChatSessionGetAllDto>>();
+
+            Console.WriteLine($"Chat sessions: {chatSessions.Count}");
+        }
+    }
 
     private void IncrementCount()
     {

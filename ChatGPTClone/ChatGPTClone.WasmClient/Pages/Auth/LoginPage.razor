@@ -54,7 +54,7 @@
         {
             var authLoginDto = await response.Content.ReadFromJsonAsync<ResponseDto<AuthLoginDto>>();
 
-            await LocalStorage.SetItemAsync("user-token", authLoginDto.Data.Token);
+            await LocalStorage.SetItemAsync<AuthLoginDto>("user-token", authLoginDto.Data);
 
             // Trigger authentication state changed event
             await AuthenticationStateProvider.GetAuthenticationStateAsync();

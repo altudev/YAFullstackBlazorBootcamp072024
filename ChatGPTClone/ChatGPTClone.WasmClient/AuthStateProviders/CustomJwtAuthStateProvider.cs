@@ -2,6 +2,7 @@ using System;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Blazored.LocalStorage;
+using ChatGPTClone.Application.Features.Auth.Commands.Login;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace ChatGPTClone.WasmClient.AuthStateProviders;
@@ -19,9 +20,9 @@ public class CustomJwtAuthStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await _localStorage.GetItemAsync<string>("user-token");
+        var authLoginDto = await _localStorage.GetItemAsync<AuthLoginDto>("user-token");
 
-        if (string.IsNullOrEmpty(token))
+        if (authLoginDto is null || string.IsNullOrEmpty(authLoginDto.Token))
         {
             // Anonymous user
             var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
@@ -35,7 +36,7 @@ public class CustomJwtAuthStateProvider : AuthenticationStateProvider
             return new AuthenticationState(anonymousUser);
         }
 
-        var claims = ParseClaimsFromJwt(token);
+        var claims = ParseClaimsFromJwt(authLoginDto.Token);
 
         var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
 
@@ -43,7 +44,7 @@ public class CustomJwtAuthStateProvider : AuthenticationStateProvider
 
         NotifyAuthenticationStateChanged(Task.FromResult(authState));
 
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authLoginDto.Token);
 
         return authState;
     }

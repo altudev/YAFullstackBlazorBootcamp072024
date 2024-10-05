@@ -5,7 +5,7 @@ using MediatR;
 
 namespace ChatGPTClone.Application.Features.Auth.Commands.Login
 {
-    public class AuthLoginCommandHandler:IRequestHandler<AuthLoginCommand,ResponseDto<AuthLoginDto>>
+    public class AuthLoginCommandHandler : IRequestHandler<AuthLoginCommand, ResponseDto<AuthLoginDto>>
     {
         private readonly IIdentityService _identityService;
 

@@ -6,6 +6,8 @@ namespace ChatGPTClone.Application.Common.Interfaces
     {
         Task<bool> AuthenticateAsync(IdentityAuthenticateRequest request, CancellationToken cancellationToken);
 
+        Task<IdentityRefreshTokenResponse> RefreshTokenAsync(IdentityRefreshTokenRequest request, CancellationToken cancellationToken);
+
         Task<bool> CheckEmailExistsAsync(string email, CancellationToken cancellationToken);
 
         Task<bool> CheckIfEmailVerifiedAsync(string email, CancellationToken cancellationToken);
