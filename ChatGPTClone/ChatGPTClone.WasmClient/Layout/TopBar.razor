@@ -1,0 +1,19 @@
+﻿@using Blazored.LocalStorage
+@using ChatGPTClone.Domain.Enums
+@using ChatGPTClone.WasmClient.Components
+@using ChatGPTClone.WasmClient.Models
+
+@inject ILocalStorageService LocalStorage
+
+<header class="border-b border-base-100 flex justify-between items-center mx-4 mt-2">
+    <!-- Model Dropdown -->
+    <GptModelMenu />
+
+    <div class="flex items-center space-x-4">
+        <!-- Language Dropdown -->
+        <LanguageMenu />
+        <!-- Profile Dropdown -->
+        <ProfileMenu />
+    </div>
+
+</header>

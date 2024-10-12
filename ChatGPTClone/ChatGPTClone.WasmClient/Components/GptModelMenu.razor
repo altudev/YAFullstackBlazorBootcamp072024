@@ -1,0 +1,42 @@
+﻿@using ChatGPTClone.Domain.Enums
+@using ChatGPTClone.WasmClient.Models
+<div class="dropdown">
+    <button class="btn btn-ghost" @onclick="ToggleDropdown">
+        @GptModelTypeState.GptModelType.ToString()
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    @if (isDropdownOpen)
+    {
+        <ul tabindex="0" class="absolute mt-2 dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            @foreach (var model in Enum.GetValues<GptModelType>())
+            {
+                <li class="@(GptModelTypeState.GptModelType == model ? "bg-gray-600" : "")">
+                    <button @onclick="() => SelectModel(model)">@model.ToString()
+                        @(GptModelTypeState.GptModelType == model ? "👈" : "")</button>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private bool isDropdownOpen = false;
+
+    [CascadingParameter(Name = "GptModelTypeState")]
+    public GptModelTypeState GptModelTypeState { get; set; }
+
+    private void SelectModel(GptModelType model)
+    {
+        GptModelTypeState.GptModelType = model;
+
+        GptModelTypeState.StateChanged.Invoke();
+    }
+
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+    }
+}

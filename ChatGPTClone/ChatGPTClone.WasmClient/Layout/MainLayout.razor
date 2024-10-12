@@ -1,18 +1,48 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@using Blazored.LocalStorage
+@using ChatGPTClone.Domain.Enums
+@using ChatGPTClone.WasmClient.Models
+@using ChatGPTClone.WasmClient.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
-<div class="flex">
-    <NavMenu />
-    <main class="flex-1 ml-64 p-4">
+@inject ILocalStorageService LocalStorage
+@inject ThemeService ThemeService
+
+<AuthorizeView>
+    <Authorized>
+        <div class="flex" data-theme="@ThemeService.CurrentTheme">
+            <NavMenu />
+            <CascadingValue Value="@GptModelTypeState" Name="GptModelTypeState">
+                <div class="flex-1 flex flex-col">
+                    <TopBar />
+                    <main class="flex-1 flex">
+                        @Body
+                    </main>
+                </div>
+            </CascadingValue>
+        </div>
+    </Authorized>
+    <NotAuthorized>
         @Body
-    </main>
-</div>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
+
+    public GptModelTypeState GptModelTypeState { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        await ThemeService.InitializeThemeAsync();
+
+        ThemeService.OnChange += StateHasChanged;
+
+        GptModelTypeState.StateChanged += () => StateHasChanged();
+
+        await base.OnInitializedAsync();
     }
+
+
 }

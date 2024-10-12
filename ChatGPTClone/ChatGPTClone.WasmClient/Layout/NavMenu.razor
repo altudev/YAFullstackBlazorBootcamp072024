@@ -1,58 +1,87 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@using ChatGPTClone.Application.Features.ChatSessions.Queries.GetAll
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
 
 <div class="flex">
     <!-- Sidebar -->
-    <div class="bg-gray-800 text-white w-64 fixed h-screen flex flex-col">
-        <div class="p-4">
-            <a class="text-xl font-bold" href="">ChatGPTClone</a>
+    @*     <aside class="w-64 bg-base-200 border-r border-base-300  @(isOpen ? "" : "hidden")"> *@
+    <aside
+        class="w-64 bg-base-200 border-r border-base-300 transform transition-all duration-300 ease-in-out fixed md:relative h-screen @(isOpen ? "translate-x-0" : "hidden")">
+        <!-- Profile Section -->
+        <div class="border-b border-base-300 p-1">
+            <div class=" cursor-pointer" @onclick="ToggleSidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 hover:text-blue-500" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </div>
         </div>
 
-        <nav class="flex-1 overflow-y-auto">
-            <AuthorizeView>
-                <Authorized>
-                    <div class="p-2">
-                        <NavLink class="navlink block py-2 px-4 hover:bg-gray-700" href="" Match="NavLinkMatch.All">
-                            <span class="bi bi-house-door-fill inline-block mr-2"></span> Home
-                        </NavLink>
-                    </div>
-                    <div class="p-2">
-                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="counter">
-                            <span class="bi bi-plus-square-fill inline-block mr-2"></span> Counter
-                        </NavLink>
-                    </div>
-                    <div class="p-2">
-                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="weather">
-                            <span class="bi bi-list-nested inline-block mr-2"></span> Weather
-                        </NavLink>
-                    </div>
-                    <div class="p-2">
-                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="auth/logout">
-                            <span class="bi bi-list-nested inline-block mr-2"></span> Logout
-                        </NavLink>
-                    </div>
-                </Authorized>
-                <NotAuthorized>
-                    <div class="p-2">
-                        <NavLink class="block py-2 px-4 hover:bg-gray-700" href="auth/login">
-                            <span class="bi bi-lock-fill inline-block mr-2"></span> Login
-                        </NavLink>
-                    </div>
-                </NotAuthorized>
-            </AuthorizeView>
+        <!-- Navigation Menu -->
+        <nav class="p-2">
+            <ul class="menu menu-md border-base-200 border-b">
+                <li>
+                    <a class="flex items-center mb-2  font-bold">
+                        @*                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.3 0.3l4.4 4.4-1.3 1.3-4.4-4.4c-.2-.2-.5-.2-.7 0L9 3.5l3.3 3.3-1.3 1.3L8 4.5 1 11.5v1h1L8 6.5l1.3-1.3c.2-.2.2-.5 0-.7L11.3.3zM0 16h16v-1H0v1z" />
+                        </svg> *@
+                        <img class="size-4" src="https://i.hizliresim.com/jr62e8z.png" alt="Profile" />
+                        <span class="truncate w-24 text-md">ChatGPT</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="menu menu-sm mt-2">
+                @if (chatSessions is not null)
+                {
+                    @foreach (var chatSession in chatSessions)
+                    {
+
+                        <li>
+                            <button class="flex items-center gap-2 mb-2 nav-link"
+                                @onclick="@(() => NavigateToChatSession(chatSession.Id))">
+                                <span class="truncate w-48">@chatSession.Title</span>
+                            </button>
+                        </li>
+
+                    }
+                }
+            </ul>
         </nav>
+    </aside>
 
-    </div>
-
+    <!-- Toggle Button -->
+    @if (!isOpen)
+    {
+        <div class="flex-none cursor-pointer" @onclick="ToggleSidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 hover:text-blue-500" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </div>
+    }
 
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+    private bool isOpen = true; // Sidebar başlangıçta açık
+    private List<ChatSessionGetAllDto> chatSessions = null;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    private void NavigateToChatSession(Guid chatSessionId)
     {
-        collapseNavMenu = !collapseNavMenu;
+        Navigation.NavigateTo($"/{chatSessionId}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        chatSessions = await Http.GetFromJsonAsync<List<ChatSessionGetAllDto>>("ChatSessions");
+    }
+    private void ToggleSidebar()
+    {
+        isOpen = !isOpen; // Sidebar'ı aç/kapat
+        StateHasChanged(); // UI güncellemesi
     }
 }

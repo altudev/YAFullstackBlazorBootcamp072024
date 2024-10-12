@@ -1,67 +1,76 @@
-﻿@page "/"
+﻿@page "/{Id:guid}"
+@page "/"
 @using System.ComponentModel.DataAnnotations
+@using Blazored.LocalStorage
+@using ChatGPTClone.Domain.Enums
+@using ChatGPTClone.WasmClient.Models
+@using ChatGPTClone.WasmClient.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@inject ILocalStorageService LocalStorage
+@inject ThemeService ThemeService
 
 <PageTitle>Todo App</PageTitle>
 
 <AuthorizeView>
     <Authorized>
-        <div class="container mt-4">
-            <h1 class="mb-4">Todo App</h1>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <input type="text" class="form-control" placeholder="New todo" @bind="newTodoText"
-                        @onkeyup="AddTodoOnKeyUp" />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <button class="btn btn-primary w-100" @onclick="AddTodo">Add Todo</button>
-                </div>
+        <div class="flex-1 flex flex-col">
+            <!-- Main Content Area -->
+            <div class="flex-1 flex items-center justify-center">
+                @if (!isMain)
+                {
+                    <div class="text-center">
+                        <div class="mb-8">
+                            <img class="mx-auto" src="https://i.hizliresim.com/jr62e8z.png" alt="Profile" />
+                        </div>
+
+                        <!-- Action Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+                            <button class="card bg-base-100 shadow-xl">
+                                <div class="card-body">
+                                    <h3 class="card-title">@GptModelTypeState.GptModelType.ToString()</h3>
+                                </div>
+                            </button>
+                            <button class="card bg-base-100 shadow-xl">
+                                <div class="card-body">
+                                    <h3 class="card-title">@Id</h3>
+                                </div>
+                            </button>
+                            <button class="card bg-base-100 shadow-xl">
+                                <div class="card-body">
+                                    <h3 class="card-title">Kişisel web sayfamı oluştur</h3>
+                                </div>
+                            </button>
+                            <button class="card bg-base-100 shadow-xl">
+                                <div class="card-body">
+                                    <h3 class="card-title">Tesisatçı fiyat teklifi e-postası</h3>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <h1>boşs</h1>
+                }
             </div>
 
-            @if (todos.Any())
-            {
-                <ul class="list-group mt-3">
-                    @foreach (var todo in todos)
-                    {
-                        <li class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-12 col-md-6 mb-2 mb-md-0">
-                                    @if (editingTodo == todo)
-                                    {
-                                        <input type="text" class="form-control" @bind="todo.Text" @onblur="() => FinishEdit()"
-                                            @onkeyup="(e) => HandleEditKeyUp(e)" />
-                                    }
-                                    else
-                                    {
-                                        <span class="@(todo.IsCompleted ? "text-decoration-line-through" : "")">@todo.Text</span>
-                                    }
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <div class="d-flex flex-wrap justify-content-end">
-                                        <button class="btn btn-sm btn-outline-primary me-1 mb-1"
-                                            @onclick="() => ToggleComplete(todo)">
-                                            @(todo.IsCompleted ? "Undo" : "Complete")
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary me-1 mb-1"
-                                            @onclick="() => StartEdit(todo)">
-                                            Edit
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger mb-1" @onclick="() => DeleteTodo(todo)">
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p class="mt-3">No todos yet. Add one above!</p>
-            }
+            <!-- Input Area -->
+            <div class="border border-base-100 p-4">
+                <div class="max-w-3xl mx-auto relative">
+                    <input type="text" placeholder="ChatGPT uygulamasına ileti gönder"
+                        class="input input-bordered w-full pr-10" />
+                    <button class="btn btn-circle btn-ghost absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.5.5 0 0 1-.9.1l-3-4.802a.5.5 0 0 1 .11-.7l3.7-2.462-2.462-3.7a.5.5 0 0 1 .11-.7l4.802-3a.5.5 0 0 1 .7.11z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
+
     </Authorized>
     <NotAuthorized>
         <p> Giriş yapmaniz gerekmektedir. </p>
@@ -69,59 +78,23 @@
 </AuthorizeView>
 
 @code {
-    private List<TodoItem> todos = new List<TodoItem>();
-    private string newTodoText = "";
-    private TodoItem? editingTodo;
+    [Parameter]
+    public Guid Id { get; set; } = Guid.Empty;
+    private bool isMain = false;
+    private bool isDropdownOpen = false;
+    private string? currentTheme;
+    [CascadingParameter(Name = "GptModelTypeState")]
+    public GptModelTypeState GptModelTypeState { get; set; }
 
-    private void AddTodoOnKeyUp(KeyboardEventArgs e)
+    protected override async Task OnInitializedAsync()
     {
-        if (e.Key == "Enter")
-        {
-            AddTodo();
-        }
+        currentTheme = await LocalStorage.GetItemAsync<string>("theme");
+
+        await base.OnInitializedAsync();
     }
 
-    private void AddTodo()
+    private void ToggleDropdown()
     {
-        if (!string.IsNullOrWhiteSpace(newTodoText))
-        {
-            todos.Add(new TodoItem { Text = newTodoText });
-            newTodoText = "";
-        }
-    }
-
-    private void DeleteTodo(TodoItem todo)
-    {
-        todos.Remove(todo);
-    }
-
-    private void ToggleComplete(TodoItem todo)
-    {
-        todo.IsCompleted = !todo.IsCompleted;
-    }
-
-    private void StartEdit(TodoItem todo)
-    {
-        editingTodo = todo;
-    }
-
-    private void FinishEdit()
-    {
-        editingTodo = null;
-    }
-
-    private void HandleEditKeyUp(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            FinishEdit();
-        }
-    }
-
-    private class TodoItem
-    {
-        [Required]
-        public string Text { get; set; } = "";
-        public bool IsCompleted { get; set; }
+        isDropdownOpen = !isDropdownOpen;
     }
 }

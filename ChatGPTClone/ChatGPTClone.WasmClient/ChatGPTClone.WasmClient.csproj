@@ -17,4 +17,8 @@
     <ProjectReference Include="..\ChatGPTClone.Application\ChatGPTClone.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
