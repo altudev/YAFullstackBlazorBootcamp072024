@@ -1,15 +1,22 @@
-﻿@page "/{Id:guid}"
-@page "/"
+﻿@page "/"
+@page "/{Id:guid}"
 @using System.ComponentModel.DataAnnotations
 @using Blazored.LocalStorage
+@using ChatGPTClone.Application.Common.Models.General
+@using ChatGPTClone.Application.Features.ChatMessages.Commands.Create
+@using ChatGPTClone.Application.Features.ChatSessions.Commands.Create
+@using ChatGPTClone.Application.Features.ChatSessions.Queries.GetById
 @using ChatGPTClone.Domain.Enums
+@using ChatGPTClone.Domain.ValueObjects
 @using ChatGPTClone.WasmClient.Models
 @using ChatGPTClone.WasmClient.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @inject ILocalStorageService LocalStorage
 @inject ThemeService ThemeService
+@inject HttpClient Http
 
-<PageTitle>Todo App</PageTitle>
+
+<PageTitle>ChatGPT Clone</PageTitle>
 
 <AuthorizeView>
     <Authorized>
@@ -17,7 +24,7 @@
         <div class="flex-1 flex flex-col">
             <!-- Main Content Area -->
             <div class="flex-1 flex items-center justify-center">
-                @if (!isMain)
+                @if (Id == Guid.Empty)
                 {
                     <div class="text-center">
                         <div class="mb-8">
@@ -51,22 +58,39 @@
                 }
                 else
                 {
-                    <h1>boşs</h1>
+                    if (chatSessionGetByIdDto is not null)
+                    {
+                        <ChatUI ChatThreads="@chatSessionGetByIdDto.Threads" />
+                    }
                 }
             </div>
 
             <!-- Input Area -->
             <div class="border border-base-100 p-4">
                 <div class="max-w-3xl mx-auto relative">
-                    <input type="text" placeholder="ChatGPT uygulamasına ileti gönder"
-                        class="input input-bordered w-full pr-10" />
-                    <button class="btn btn-circle btn-ghost absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <input type="text" placeholder="ChatGPT uygulamasına ileti gönder"
+                            @bind=@userMessage bind:event="oninput" @onkeypress="HandleKeyPress"
+                            class="input input-bordered w-full pr-10" />
+
+                  @if(Id == Guid.Empty){
+                      <button class="btn btn-circle btn-ghost absolute right-2 top-1/2 transform -translate-y-1/2"
+                        @onclick="CreateChatSession">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             viewBox="0 0 16 16">
                             <path
                                 d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.5.5 0 0 1-.9.1l-3-4.802a.5.5 0 0 1 .11-.7l3.7-2.462-2.462-3.7a.5.5 0 0 1 .11-.7l4.802-3a.5.5 0 0 1 .7.11z" />
                         </svg>
                     </button>
+                  }else{
+                      <button class="btn btn-circle btn-ghost absolute right-2 top-1/2 transform -translate-y-1/2"
+                        @onclick="SendMessage">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.5.5 0 0 1-.9.1l-3-4.802a.5.5 0 0 1 .11-.7l3.7-2.462-2.462-3.7a.5.5 0 0 1 .11-.7l4.802-3a.5.5 0 0 1 .7.11z" />
+                        </svg>
+                    </button>
+                  }
                 </div>
             </div>
         </div>
@@ -80,21 +104,94 @@
 @code {
     [Parameter]
     public Guid Id { get; set; } = Guid.Empty;
-    private bool isMain = false;
+    private ChatMessageCreateCommand chatMessageCreateCommand = new();
+    private ChatSessionCreateCommand chatSessionCreateCommand = new();
+    private ChatSessionGetByIdDto chatSessionGetByIdDto;
+    private string userMessage = string.Empty;
     private bool isDropdownOpen = false;
-    private string? currentTheme;
+
     [CascadingParameter(Name = "GptModelTypeState")]
     public GptModelTypeState GptModelTypeState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        currentTheme = await LocalStorage.GetItemAsync<string>("theme");
+        if (Id == Guid.Empty)
+            chatSessionCreateCommand = new();
+        else
+            chatSessionGetByIdDto = await Http.GetFromJsonAsync<ChatSessionGetByIdDto>($"ChatSessions/{Id}");
 
         await base.OnInitializedAsync();
+    }
+
+    private async Task CreateChatSession()
+    {
+        if (string.IsNullOrEmpty(userMessage))
+            return;
+
+        chatSessionCreateCommand.Content = userMessage;
+
+        chatSessionCreateCommand.Model = GptModelTypeState.GptModelType;
+
+        var response = await Http.PostAsJsonAsync("ChatSessions", chatSessionCreateCommand);
+
+        if (response.IsSuccessStatusCode)
+        {
+
+            var responseDto = await response.Content.ReadFromJsonAsync<ResponseDto<Guid>>();
+
+            userMessage = string.Empty;
+
+            chatMessageCreateCommand = new();
+
+             Id = responseDto.Data;
+
+             chatSessionGetByIdDto = await Http.GetFromJsonAsync<ChatSessionGetByIdDto>($"ChatSessions/{Id}");
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrEmpty(userMessage))
+            return;
+
+        chatMessageCreateCommand.ChatSessionId = Id;
+
+        chatMessageCreateCommand.Content = userMessage;
+
+        chatMessageCreateCommand.Model = GptModelTypeState.GptModelType;
+
+        var response = await Http.PostAsJsonAsync("ChatMessages", chatMessageCreateCommand);
+
+        if (response.IsSuccessStatusCode)
+        {
+
+            var responseDto = await response.Content.ReadFromJsonAsync<ResponseDto<ChatThread>>();
+
+            var index = chatSessionGetByIdDto.Threads.FindIndex(x => x.Id == responseDto.Data.Id);
+
+            if (index > 0)
+            {
+                chatSessionGetByIdDto.Threads[index] = responseDto.Data;
+            }else{
+                chatSessionGetByIdDto.Threads.Add(responseDto.Data);
+            }
+
+            await InvokeAsync(StateHasChanged);
+
+            userMessage = string.Empty;
+
+            chatMessageCreateCommand = new();
+        }
     }
 
     private void ToggleDropdown()
     {
         isDropdownOpen = !isDropdownOpen;
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+            await SendMessage();
     }
 }

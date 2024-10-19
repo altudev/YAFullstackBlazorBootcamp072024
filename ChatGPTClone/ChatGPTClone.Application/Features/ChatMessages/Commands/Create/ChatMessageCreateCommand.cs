@@ -5,7 +5,7 @@ using MediatR;
 
 namespace ChatGPTClone.Application.Features.ChatMessages.Commands.Create;
 
-public class ChatMessageCreateCommand : IRequest<ResponseDto<List<ChatMessage>>>
+public class ChatMessageCreateCommand : IRequest<ResponseDto<ChatThread>>
 {
     public Guid ChatSessionId { get; set; }
     public string? ThreadId { get; set; }
